@@ -1,1 +1,14 @@
-<p>login works!</p>
+<h2>Iniciar sesión</h2>
+
+<form (ngSubmit)="iniciarSesion()">
+  <label>Email</label>
+  <input type="email" name="email" [(ngModel)]="credenciales.email" required />
+
+  <label>Contraseña</label>
+  <input type="password" name="password" [(ngModel)]="credenciales.password" required />
+
+  <button type="submit">Ingresar</button>
+</form>
+
+@if (mensajeError()) { <p style="color: red">{{ mensajeError() }}</p> }
+@if (mensajeOk()) { <p style="color: green">{{ mensajeOk() }}</p> }

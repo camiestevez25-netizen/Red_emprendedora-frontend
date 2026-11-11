@@ -1,17 +1,19 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { LoginRequest, LoginResponse } from '../models/auth.model';
+import { LoginRequest } from '../models/auth.model';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly http = inject(HttpClient);
-  private readonly authUrl = `${environment.apiUrl}/auth/login`;
 
-  login(credenciales: LoginRequest): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(this.authUrl, credenciales).pipe(
-      tap((resp) => localStorage.setItem('token', resp.token))
+  login(cred: LoginRequest): Observable<unknown> {
+    const basic = btoa(`${cred.email}:${cred.password}`);
+    const headers = new HttpHeaders({ Authorization: `Basic ${basic}` });
+
+    return this.http.get(`${environment.apiUrl}/usuarios`, { headers }).pipe(
+      tap(() => localStorage.setItem('token', basic))
     );
   }
 
