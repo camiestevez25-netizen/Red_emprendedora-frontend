@@ -1,14 +1,73 @@
-<h2>Iniciar sesión</h2>
+<section class="container page login">
+  <div class="card login-card">
+    <div class="card-body">
+      <h1>Iniciar sesión</h1>
+      <p class="text-muted">Entrá para reservar stands o administrar tus ferias.</p>
 
-<form (ngSubmit)="iniciarSesion()">
-  <label>Email</label>
-  <input type="email" name="email" [(ngModel)]="credenciales.email" required />
+      @if (mensajeError()) {
+        <div class="alert alert-error" role="alert">{{ mensajeError() }}</div>
+      }
 
-  <label>Contraseña</label>
-  <input type="password" name="password" [(ngModel)]="credenciales.password" required />
+      <form #form="ngForm" (ngSubmit)="form.valid && iniciarSesion()" novalidate>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input
+            id="email"
+            type="email"
+            name="email"
+            autocomplete="email"
+            placeholder="tu@email.com"
+            [(ngModel)]="credenciales.email"
+            #email="ngModel"
+            required
+            email
+          />
+          @if ((email.touched || form.submitted) && email.errors?.['required']) {
+            <span class="form-error">Ingresá tu email</span>
+          } @else if ((email.touched || form.submitted) && email.errors?.['email']) {
+            <span class="form-error">El email no tiene un formato válido</span>
+          }
+        </div>
 
-  <button type="submit">Ingresar</button>
-</form>
+        <div class="form-group">
+          <label for="contrasena">Contraseña</label>
+          <div class="campo-contrasena">
+            <input
+              id="contrasena"
+              [type]="verContrasena() ? 'text' : 'password'"
+              name="contrasena"
+              autocomplete="current-password"
+              [(ngModel)]="credenciales.contrasena"
+              #contrasena="ngModel"
+              required
+            />
+            <button
+              type="button"
+              class="ver-contrasena"
+              (click)="verContrasena.set(!verContrasena())"
+              [attr.aria-label]="verContrasena() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+            >
+              <span class="icon">{{ verContrasena() ? 'visibility_off' : 'visibility' }}</span>
+            </button>
+          </div>
+          @if ((contrasena.touched || form.submitted) && contrasena.errors?.['required']) {
+            <span class="form-error">Ingresá tu contraseña</span>
+          }
+        </div>
 
-@if (mensajeError()) { <p style="color: red">{{ mensajeError() }}</p> }
-@if (mensajeOk()) { <p style="color: green">{{ mensajeOk() }}</p> }
+        <label class="recordarme">
+          <input type="checkbox" name="recordarme" [(ngModel)]="recordarme" />
+          Recordarme
+        </label>
+
+        <button type="submit" class="btn btn-primary btn-block" [disabled]="cargando()">
+          {{ cargando() ? 'Ingresando…' : 'Ingresar' }}
+        </button>
+      </form>
+
+      <p class="login-pie text-muted">
+        ¿No tenés cuenta? <a routerLink="/registro">Registrate</a>
+      </p>
+    </div>
+  </div>
+</section>

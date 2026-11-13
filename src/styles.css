@@ -129,7 +129,8 @@ p { margin: 0 0 var(--space-3); }
 }
 
 .page {
-  padding: var(--space-6) 0 var(--space-8);
+  padding-top: var(--space-6);
+  padding-bottom: var(--space-8);
 }
 
 .grid {
@@ -411,10 +412,33 @@ textarea.ng-invalid.ng-touched {
   margin-top: var(--space-5);
 }
 
-/* ---------- 12. Responsive ---------- */
+/* ---------- 12. Íconos (Material Symbols Outlined) ---------- */
+/* Uso: <span class="icon">calendar_month</span>. Lineales, sin relleno */
+.icon {
+  font-family: 'Material Symbols Outlined';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 20px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  vertical-align: middle;
+  -webkit-font-smoothing: antialiased;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  user-select: none;
+}
+
+.icon-sm { font-size: 16px; }
+.icon-lg { font-size: 28px; }
+
+/* ---------- 13. Responsive ---------- */
 @media (max-width: 768px) {
   .container { padding: 0 var(--space-4); }
-  .page { padding: var(--space-5) 0 var(--space-6); }
+  .page { padding: var(--space-5);  padding-bottom: (--space-6); }
   .flex-between { flex-direction: column; align-items: stretch; }
   .modal { padding: var(--space-5); }
 }
