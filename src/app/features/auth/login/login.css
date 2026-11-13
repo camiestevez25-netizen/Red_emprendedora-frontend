@@ -1,0 +1,67 @@
+.login {
+  display: flex;
+  justify-content: center;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 440px;
+}
+
+.login-card .card-body {
+  padding: var(--space-6);
+}
+
+.campo-contrasena {
+  position: relative;
+}
+
+.campo-contrasena input {
+  padding-right: var(--btn-height);
+}
+
+.ver-contrasena {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: var(--btn-height);
+  height: var(--btn-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--color-muted);
+  cursor: pointer;
+}
+
+.ver-contrasena:hover {
+  color: var(--color-text);
+}
+
+.recordarme {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.recordarme input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-primary);
+}
+
+.login-pie {
+  margin: var(--space-5) 0 0;
+  text-align: center;
+  font-size: 14px;
+}
+
+@media (max-width: 768px) {
+  .login-card .card-body {
+    padding: var(--space-5);
+  }
+}
