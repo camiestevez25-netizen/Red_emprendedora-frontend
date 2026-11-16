@@ -1,0 +1,31 @@
+<a class="card tarjeta" [class.horizontal]="variante() === 'horizontal'" [routerLink]="['/ferias', evento().id]">
+  <div class="tarjeta-foto">
+    @if (!imagenFallo()) {
+      <img [src]="imagen()" [alt]="'Foto ilustrativa de ' + evento().nombre" (error)="imagenFallo.set(true)" />
+    } @else {
+      <span class="icon icon-lg" aria-hidden="true">storefront</span>
+    }
+  </div>
+
+  <div class="card-body tarjeta-cuerpo">
+    <div class="tarjeta-encabezado">
+      <h3>{{ evento().nombre }}</h3>
+      <app-badge-estado [estado]="evento().estado" />
+    </div>
+
+    <p class="card-meta">
+      <span class="icon icon-sm" aria-hidden="true">calendar_month</span>
+      {{ evento().fechaInicio | rangoFechas: evento().fechaFin }}
+    </p>
+    <p class="card-meta">
+      <span class="icon icon-sm" aria-hidden="true">location_on</span>
+      {{ evento().nombreLocalidad }}
+    </p>
+
+    <span class="tag">{{ evento().precioEntradaTexto }}</span>
+
+    @if (variante() === 'vertical') {
+      <span class="tarjeta-ver">Ver detalle <span class="icon icon-sm" aria-hidden="true">arrow_forward</span></span>
+    }
+  </div>
+</a>
