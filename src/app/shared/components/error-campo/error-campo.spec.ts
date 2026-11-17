@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { ErrorCampo } from './error-campo';
 
 describe('ErrorCampo', () => {
-  function crear(errores: Record<string, string>, campo: string) {
+function crear(errores: Record<string, string> | null, campo: string) {
     const fixture = TestBed.createComponent(ErrorCampo);
     fixture.componentRef.setInput('errores', errores);
     fixture.componentRef.setInput('campo', campo);
@@ -25,4 +25,9 @@ describe('ErrorCampo', () => {
     const el = crear({}, 'email');
     expect(el.querySelector('.form-error')).toBeNull();
   });
+
+  it('no falla si errores es null', () => {
+  const el = crear(null, 'email');
+  expect(el.querySelector('.form-error')).toBeNull();
+});
 });
