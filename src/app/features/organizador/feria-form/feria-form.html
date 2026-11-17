@@ -1,5 +1,106 @@
-<!-- Pantalla vacía: la completa Agu -->
- <section class="container page">
-    <h1> Crear / editar ferias</h1>
-    <p class="text-muted">Pantalla en contrucción.</p>
- </section>
+<section class="container page">
+  <div class="encabezado">
+    <h1>{{ esEdicion ? 'Editar feria' : 'Crear una feria' }}</h1>
+    @if (evento(); as e) {
+      <app-badge-estado [estado]="e.estado" />
+    }
+  </div>
+
+  @if (cargando()) {
+    <p class="text-muted">Cargando feria…</p>
+  } @else {
+    @if (cancelada()) {
+      <div class="alert alert-warning">Esta feria está cancelada: no se puede editar.</div>
+    } @else if (noEsMia()) {
+      <div class="alert alert-warning">Esta feria es de otro/a organizador/ra: solo podés verla.</div>
+    }
+    @if (mensajeError()) {
+      <div class="alert alert-error" role="alert">{{ mensajeError() }}</div>
+    }
+    @if (mensajeOk()) {
+      <div class="alert alert-success" role="status">{{ mensajeOk() }}</div>
+    }
+
+    <form class="card" #form="ngForm" (ngSubmit)="guardar(form)" novalidate>
+      <fieldset class="card-body" [disabled]="soloLectura() || guardando()">
+        <div class="form-group">
+          <label for="nombre">Nombre de la feria *</label>
+          <input id="nombre" name="nombre" type="text" maxlength="50" placeholder="Ej. Feria de primavera"
+                 [(ngModel)]="datos.nombre" #nombre="ngModel" required />
+          @if ((nombre.touched || form.submitted) && nombre.errors?.['required']) {
+            <span class="form-error">El nombre es obligatorio.</span>
+          }
+          @if (errores()['nombre']) { <span class="form-error">{{ errores()['nombre'] }}</span> }
+        </div>
+
+        <div class="fila">
+          <div class="form-group">
+            <label for="fechaInicio">Fecha de inicio *</label>
+            <input id="fechaInicio" name="fechaInicio" type="date"
+                   [(ngModel)]="datos.fechaInicio" #fechaInicio="ngModel" required />
+            @if ((fechaInicio.touched || form.submitted) && fechaInicio.errors?.['required']) {
+              <span class="form-error">Elegí la fecha de inicio.</span>
+            }
+            @if (errores()['fechaInicio']) { <span class="form-error">{{ errores()['fechaInicio'] }}</span> }
+          </div>
+
+          <div class="form-group">
+            <label for="fechaFin">Fecha de fin *</label>
+            <input id="fechaFin" name="fechaFin" type="date" [min]="datos.fechaInicio"
+                   [(ngModel)]="datos.fechaFin" #fechaFin="ngModel" required />
+            @if ((fechaFin.touched || form.submitted) && fechaFin.errors?.['required']) {
+              <span class="form-error">Elegí la fecha de fin.</span>
+            }
+            @if (errores()['fechaFin']) { <span class="form-error">{{ errores()['fechaFin'] }}</span> }
+          </div>
+        </div>
+
+        <div class="fila">
+          <div class="form-group">
+            <label for="precioEntrada">Precio de la entrada ($)</label>
+            <input id="precioEntrada" name="precioEntrada" type="number" min="0" step="1" placeholder="0"
+                   [(ngModel)]="datos.precioEntrada" #precio="ngModel" />
+            <span class="form-help">Vacío o 0 = entrada gratuita</span>
+            @if (precio.value < 0) { <span class="form-error">El precio no puede ser negativo.</span> }
+            @if (errores()['precioEntrada']) { <span class="form-error">{{ errores()['precioEntrada'] }}</span> }
+          </div>
+
+          <div class="form-group">
+            <label for="metrosCuadrados">Superficie (m²) *</label>
+            <input id="metrosCuadrados" name="metrosCuadrados" type="text" maxlength="25" placeholder="Ej. 150"
+                   [(ngModel)]="datos.metrosCuadrados" #metros="ngModel" required />
+            @if ((metros.touched || form.submitted) && metros.errors?.['required']) {
+              <span class="form-error">Indicá la superficie.</span>
+            }
+            @if (errores()['metrosCuadrados']) { <span class="form-error">{{ errores()['metrosCuadrados'] }}</span> }
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="idLocalidad">Localidad *</label>
+          <select id="idLocalidad" name="idLocalidad" [(ngModel)]="datos.idLocalidad" #localidad="ngModel" required>
+            <option [ngValue]="null" disabled>Seleccioná una localidad.</option>
+            @for (l of localidades(); track l.idLocalidad) {
+              <option [ngValue]="l.idLocalidad">{{ l.nombreLocalidad }}, {{ l.provinciaLocalidad }}</option>
+            }
+          </select>
+          @if ((localidad.touched || form.submitted) && localidad.errors?.['required']) {
+            <span class="form-error">Elegí una localidad.</span>
+          }
+          @if (errores()['idLocalidad']) { <span class="form-error">{{ errores()['idLocalidad'] }}</span> }
+        </div>
+      </fieldset>
+
+      <div class="card-body acciones">
+        <a class="btn btn-secondary" routerLink="/organizador">
+          {{ soloLectura() ? 'Volver' : 'Cancelar' }}
+        </a>
+        @if (!soloLectura()) {
+          <button type="submit" class="btn btn-primary" [disabled]="guardando()">
+            {{ guardando() ? 'Guardando…' : (esEdicion ? 'Guardar cambios' : 'Crear feria') }}
+          </button>
+        }
+      </div>
+    </form>
+  }
+</section>
