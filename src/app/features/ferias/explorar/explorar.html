@@ -2,10 +2,15 @@
   <h1>Explora las ferias</h1>
 
   <div class="filtros">
-    <!-- Se habilita cuando Lou suba LocalidadService -->
-    <select name="localidad" aria-label="Filtrar por localidad" disabled>
-      <option>Todas las localidades</option>
+    <select name="localidad" aria-label="Filtrar por localidad"
+    [ngModel]="idLocalidad()"
+    (ngModelChange)="cambiarLocalidad($event)">
+    <option [ngValue]="null">Todas las localidades</option>>
+    @for (l of localidades(); track l.idLocalidad) {
+      <option [ngValue]="l.idLocalidad">{{ l.nombreLocalidad }}, {{ l.provinciaLocalidad}}</option>
+    }
     </select>
+
 
     <select name="estado" aria-label="Filtrar por estado" [ngModel]="estado()" (ngModelChange)="cambiarEstado($event)">
       <option value="">Todos los estados</option>
