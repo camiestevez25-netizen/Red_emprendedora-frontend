@@ -1,5 +1,51 @@
-<!-- Pantalla vacía: la completa Agu -->
- <section class="container page">
-    <h1>Explorá ferias</h1>
-    <p class="text-muted">Pantalla en construcción.</p>
- </section>
+<section class="container page">
+  <h1>Explora las ferias</h1>
+
+  <div class="filtros">
+    <!-- Se habilita cuando Lou suba LocalidadService -->
+    <select name="localidad" aria-label="Filtrar por localidad" disabled>
+      <option>Todas las localidades</option>
+    </select>
+
+    <select name="estado" aria-label="Filtrar por estado" [ngModel]="estado()" (ngModelChange)="cambiarEstado($event)">
+      <option value="">Todos los estados</option>
+      @for (e of estados; track e) {
+        <option [value]="e">{{ e }}</option>
+      }
+    </select>
+
+    <div class="buscador">
+      <span class="icon" aria-hidden="true">search</span>
+      <input type="text" name="busqueda" placeholder="Buscar feria…" aria-label="Buscar feria por nombre"
+             [(ngModel)]="busqueda" />
+    </div>
+  </div>
+
+  @if (cargando()) {
+    <p class="text-muted">Cargando ferias…</p>
+  } @else if (mensajeError()) {
+    <div class="alert alert-error" role="alert">
+      {{ mensajeError() }}
+      <button type="button" class="btn btn-secondary btn-sm" (click)="cargar()">Reintentar</button>
+    </div>
+  } @else {
+    <p class="text-muted text-small resultado">
+      {{ filtradas().length }} {{ filtradas().length === 1 ? 'feria' : 'ferias' }}
+    </p>
+
+    <div class="grid">
+      @for (e of filtradas(); track e.id) {
+        <app-tarjeta-feria [evento]="e" />
+      } @empty {
+        <div class="vacio">
+          <span class="icon icon-lg" aria-hidden="true">storefront</span>
+          <p>No encontramos ferias{{ hayFiltros() ? ' con esos filtros' : ' por ahora' }}.</p>
+          @if (hayFiltros()) {
+            <button type="button" class="btn btn-secondary" (click)="limpiarFiltros()">Limpiar filtros</button>
+          }
+        </div>
+      }
+    </div>
+    <!-- Acá va el paginador de Lou -->
+  }
+</section>
