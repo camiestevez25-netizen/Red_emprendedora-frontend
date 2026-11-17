@@ -1,1 +1,37 @@
-<p>modal-confirmacion works!</p>
+@if (abierto()) {
+  <div class="modal-backdrop" (click)="volver()">
+    <div
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-titulo"
+      (click)="$event.stopPropagation()"
+    >
+      <h2 id="modal-titulo">{{ titulo() }}</h2>
+
+      @if (mensaje()) {
+        <p class="text-muted">{{ mensaje() }}</p>
+      }
+
+      @if (error()) {
+        <div class="alert alert-error">{{ error() }}</div>
+      }
+
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" [disabled]="cargando()" (click)="volver()">
+          {{ textoCancelar() }}
+        </button>
+        <button
+          type="button"
+          class="btn"
+          [class.btn-primary]="tipo() === 'primario'"
+          [class.btn-danger]="tipo() === 'peligro'"
+          [disabled]="cargando()"
+          (click)="confirmar.emit()"
+        >
+          {{ cargando() ? 'Procesando…' : textoConfirmar() }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
