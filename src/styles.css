@@ -5,7 +5,7 @@
    en lugar de poner colores o tamaños "a mano".
    ========================================================= */
 
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Serif+Display&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&display=swap');
 
 /* ---------- 1. Variables ---------- */
 :root {
@@ -36,8 +36,8 @@
   --color-danger-hover: #9A4430;
 
   /* Tipografías */
-  --font-title: 'DM Serif Display', Georgia, serif;
-  --font-body: 'DM Sans', Arial, sans-serif;
+  --font-title: 'Fraunces', Georgia, serif;
+  --font-body: 'Work Sans', Arial, sans-serif;
 
   /* Espaciado (múltiplos de 4 / 8 px) */
   --space-1: 4px;
@@ -99,7 +99,7 @@ a:hover {
 /* ---------- 3. Tipografía ---------- */
 h1, h2 {
   font-family: var(--font-title);
-  font-weight: 400;
+  font-weight: 500;
   line-height: 1.15;
   margin: 0 0 var(--space-4);
   color: var(--color-text);
