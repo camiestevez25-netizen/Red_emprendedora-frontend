@@ -1,1 +1,58 @@
-<!-- Navbar según roles: lo completa Lou -->
+<header class="navbar">
+  <div class="container navbar-contenido">
+    <a routerLink="/" class="marca" (click)="cerrarMenu()">
+      <span class="icon icon-lg">storefront</span>
+      <span class="marca-texto">Red<br />Emprendedora</span>
+    </a>
+
+    <!-- Botón hamburguesa: solo se ve en celular -->
+    <button
+      type="button"
+      class="navbar-toggle"
+      aria-controls="navbar-menu"
+      [attr.aria-expanded]="menuAbierto()"
+      [attr.aria-label]="menuAbierto() ? 'Cerrar menú' : 'Abrir menú'"
+      (click)="alternarMenu()"
+    >
+      <span class="icon">{{ menuAbierto() ? 'close' : 'menu' }}</span>
+    </button>
+
+    <nav id="navbar-menu" class="navbar-menu" [class.abierto]="menuAbierto()" aria-label="Navegación principal">
+      @if (!auth.estaLogueado()) {
+        <!-- Visitante -->
+        <a routerLink="/ferias" routerLinkActive="activo" (click)="cerrarMenu()">Explorá ferias</a>
+        <a routerLink="/" fragment="como-funciona" (click)="cerrarMenu()">¿Cómo funciona?</a>
+        <a routerLink="/" fragment="contacto" (click)="cerrarMenu()">Contacto</a>
+        <a routerLink="/login" class="btn btn-secondary btn-sm" (click)="cerrarMenu()">Iniciar sesión</a>
+        <a routerLink="/registro" class="btn btn-primary btn-sm" (click)="cerrarMenu()">Registrate</a>
+      } @else {
+        @if (auth.esOrganizador()) {
+          <a routerLink="/organizador" routerLinkActive="activo" [routerLinkActiveOptions]="{ exact: true }" (click)="cerrarMenu()">Panel</a>
+          <a routerLink="/organizador/ferias" routerLinkActive="activo" [routerLinkActiveOptions]="{ exact: true }" (click)="cerrarMenu()">Mis ferias</a>
+          <a routerLink="/organizador/localidades" routerLinkActive="activo" (click)="cerrarMenu()">Localidades</a>
+        } @else {
+          <a routerLink="/ferias" routerLinkActive="activo" (click)="cerrarMenu()">Explorá ferias</a>
+        }
+
+        @if (auth.esEmprendedor()) {
+          <a routerLink="/mis-reservas" routerLinkActive="activo" (click)="cerrarMenu()">Mis reservas</a>
+        }
+
+        <button type="button" class="btn btn-secondary btn-sm" (click)="salir()">
+          <span class="icon icon-sm">logout</span>
+          Salir
+        </button>
+
+        <a
+          routerLink="/perfil"
+          class="avatar text-small"
+          [attr.aria-label]="'Mi perfil (' + auth.usuarioActual()?.nombre + ')'"
+          [title]="auth.usuarioActual()?.nombre ?? ''"
+          (click)="cerrarMenu()"
+        >
+          {{ iniciales() }}
+        </a>
+      }
+    </nav>
+  </div>
+</header>

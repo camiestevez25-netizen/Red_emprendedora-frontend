@@ -1,0 +1,36 @@
+@if (totalPaginas() > 1) {
+  <nav class="paginador" aria-label="Paginación">
+    <button
+      type="button"
+      class="btn btn-secondary btn-sm"
+      aria-label="Página anterior"
+      [disabled]="pagina() === 0"
+      (click)="ir(pagina() - 1)"
+    >
+      <span class="icon icon-sm">chevron_left</span>
+    </button>
+
+    @for (n of paginas(); track n) {
+      <button
+        type="button"
+        class="btn btn-sm"
+        [class.btn-primary]="n === pagina()"
+        [class.btn-secondary]="n !== pagina()"
+        [attr.aria-current]="n === pagina() ? 'page' : null"
+        (click)="ir(n)"
+      >
+        {{ n + 1 }}
+      </button>
+    }
+
+    <button
+      type="button"
+      class="btn btn-secondary btn-sm"
+      aria-label="Página siguiente"
+      [disabled]="pagina() >= totalPaginas() - 1"
+      (click)="ir(pagina() + 1)"
+    >
+      <span class="icon icon-sm">chevron_right</span>
+    </button>
+  </nav>
+}
