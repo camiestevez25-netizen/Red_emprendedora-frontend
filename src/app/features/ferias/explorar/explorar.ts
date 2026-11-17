@@ -5,6 +5,7 @@ import { EventoService } from '../../../core/services/evento.service';
 import { EstadoEvento, Evento, EventoFiltro } from '../../../core/models/evento.model';
 import { leerError } from '../../../core/utils/api-error.util';
 import { TarjetaFeria } from '../../../shared/components/tarjeta-feria/tarjeta-feria';
+import { claveFecha } from '../../../shared/utils/fechas';
 
 @Component({
   selector: 'app-explorar',
@@ -28,8 +29,7 @@ export class Explorar {
     const texto = normalizar(this.busqueda());
     return this.eventos()
       .filter((e) => !texto || normalizar(e.nombre).includes(texto))
-      .sort((a, b) => a.fechaInicio.localeCompare(b.fechaInicio));
-  });
+      .sort((a, b) => claveFecha(a.fechaInicio) - claveFecha(b.fechaInicio));  });
 
   // Hay algún filtro puesto (para mostrar "Limpiar filtros")
   readonly hayFiltros = computed(() => this.estado() !== '' || this.busqueda().trim() !== '');

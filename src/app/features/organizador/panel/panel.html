@@ -1,5 +1,79 @@
-<!-- Pantalla vacía: la completa Agu -->
- <section class="container page">
-    <h1>Panel del organizador</h1>
-    <p class="text-muted">Pantalla en contrucción</p>
- </section>
+<section class="container page">
+  <div class="flex-between encabezado">
+    <div>
+      <h1>Hola, {{ nombre() }}</h1>
+      <p class="text-muted">Este es el resumen de tus ferias.</p>
+    </div>
+    <a class="btn btn-primary" routerLink="/organizador/ferias/nueva">
+      <span class="icon" aria-hidden="true">add</span> Crear feria
+    </a>
+  </div>
+
+  @if (cargando()) {
+    <p class="text-muted">Cargando tus ferias…</p>
+  } @else if (mensajeError()) {
+    <div class="alert alert-error" role="alert">
+      {{ mensajeError() }}
+      <button type="button" class="btn btn-secondary btn-sm" (click)="cargar()">Reintentar</button>
+    </div>
+  } @else {
+    <div class="numeros">
+      <div class="card numero">
+        <span class="icon icon-lg" aria-hidden="true">event</span>
+        <strong>{{ total() }}</strong>
+        <span class="text-muted">Ferias creadas</span>
+      </div>
+      <div class="card numero">
+        <span class="icon icon-lg" aria-hidden="true">check_circle</span>
+        <strong>{{ activas() }}</strong>
+        <span class="text-muted">Activas</span>
+      </div>
+      <div class="card numero">
+        <span class="icon icon-lg" aria-hidden="true">event_busy</span>
+        <strong>{{ agotadas() }}</strong>
+        <span class="text-muted">Agotadas</span>
+      </div>
+      <!-- Se completa cuando Cami suba StandService.ocupacion -->
+      <div class="card numero">
+        <span class="icon icon-lg" aria-hidden="true">storefront</span>
+        <strong>—</strong>
+        <span class="text-muted">Stands totales</span>
+      </div>
+    </div>
+
+    <div class="flex-between seccion">
+      <h2>Próximas ferias</h2>
+      <a routerLink="/organizador/ferias">Ver todas <span class="icon icon-sm" aria-hidden="true">arrow_forward</span></a>
+    </div>
+
+    <div class="lista">
+      @for (f of proximas(); track f.id) {
+        <article class="card">
+          <div class="card-body proxima">
+            <div class="proxima-datos">
+              <h3>{{ f.nombre }}</h3>
+              <p class="card-meta">
+                <span class="icon icon-sm" aria-hidden="true">calendar_month</span>
+                {{ f.fechaInicio | rangoFechas: f.fechaFin }}
+              </p>
+              @if (f.nombreLocalidad) {
+                <p class="card-meta">
+                  <span class="icon icon-sm" aria-hidden="true">location_on</span>
+                  {{ f.nombreLocalidad }}
+                </p>
+              }
+            </div>
+            <app-badge-estado [estado]="f.estado" />
+            <!-- Acá va la ocupación (ocupados / total) cuando esté StandService -->
+            <a class="btn btn-secondary btn-sm" [routerLink]="['/organizador/ferias', f.id, 'stands']">Gestionar</a>
+          </div>
+        </article>
+      } @empty {
+        <div class="card card-body vacio">
+          <p>No tenés ferias próximas.</p>
+          <a class="btn btn-primary" routerLink="/organizador/ferias/nueva">Crear feria</a>
+        </div>
+      }
+    </div>
+  }
+</section>
