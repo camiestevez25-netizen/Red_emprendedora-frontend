@@ -1,0 +1,112 @@
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.navbar-contenido {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  min-height: var(--space-8);
+}
+
+/* Logo: ícono de puesto + nombre en dos líneas */
+.marca {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text);
+}
+
+.marca:hover {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.marca-texto {
+  font-family: var(--font-title);
+  line-height: 1.1;
+}
+
+.navbar-menu {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+}
+
+.navbar-menu a:not(.btn):not(.avatar) {
+  color: var(--color-text);
+  font-weight: 500;
+}
+
+.navbar-menu a:not(.btn):not(.avatar):hover,
+.navbar-menu a.activo {
+  color: var(--color-primary);
+}
+
+.navbar-menu a.activo {
+  text-decoration: underline;
+  text-underline-offset: 6px;
+}
+
+/* Círculo con las iniciales: lleva a Mi perfil */
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-6);
+  height: var(--space-6);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-primary);
+  color: #fff;
+  font-weight: 600;
+}
+
+.avatar:hover {
+  background-color: var(--color-primary-hover);
+  color: #fff;
+  text-decoration: none;
+}
+
+.navbar-toggle {
+  display: none;
+  padding: var(--space-2);
+  background: none;
+  border: none;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+/* Celular: el menú se despliega debajo de la barra */
+@media (max-width: 768px) {
+  .navbar-toggle {
+    display: inline-flex;
+  }
+
+  .navbar-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    background-color: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    box-shadow: var(--shadow);
+  }
+
+  .navbar-menu.abierto {
+    display: flex;
+  }
+
+  .avatar {
+    align-self: flex-start;
+  }
+}
