@@ -1,8 +1,8 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { environment } from '../../../../environments/environment';
+import { LocalidadService } from '../../../core/services/localidad.service';
 import { EventoService } from '../../../core/services/evento.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { Evento, EventoRequest, EventoUpdate } from '../../../core/models/evento.model';
@@ -22,8 +22,7 @@ type DatosFeria = Omit<EventoRequest, 'idLocalidad'> & { idLocalidad: number | n
 export class FeriaForm {
   private readonly eventoService = inject(EventoService);
   private readonly auth = inject(AuthService);
-  private readonly http = inject(HttpClient); // TEMPORAL: reemplazar por LocalidadService de Lou
-  private readonly route = inject(ActivatedRoute);
+  private readonly localidadService = inject(LocalidadService);  private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
 
   // /organizador/ferias/nueva -> null ; /organizador/ferias/7/editar -> 7
@@ -122,9 +121,10 @@ export class FeriaForm {
 
   // TEMPORAL: cuando Lou suba LocalidadService, usar localidadService.listar()
   private cargarLocalidades(): void {
-    this.http.get<Localidad[]>(`${environment.apiUrl}/localidades`).subscribe({
+    this.localidadService.listar().subscribe({
       next: (lista) => this.localidades.set(lista),
-      error: (err: HttpErrorResponse) => this.mensajeError.set(leerError(err).mensaje),
+      error: (err: HttpErrorResponse) =>
+    this.mensajeError.set(leerError(err).mensaje),
     });
   }
 
