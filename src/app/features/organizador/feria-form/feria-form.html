@@ -68,7 +68,11 @@
           <div class="form-group">
             <label for="metrosCuadrados">Superficie (m²) *</label>
             <input id="metrosCuadrados" name="metrosCuadrados" type="text" maxlength="25" placeholder="Ej. 150"
-                   [(ngModel)]="datos.metrosCuadrados" #metros="ngModel" required />
+                   [(ngModel)]="datos.metrosCuadrados" #metros="ngModel" required
+                   [disabled]="metrosBloqueados()" />
+            @if (metrosBloqueados()) {
+              <span class="form-help">No se puede cambiar porque la feria ya tiene stands reservados.</span>
+            }
             @if ((metros.touched || form.submitted) && metros.errors?.['required']) {
               <span class="form-error">Indicá la superficie.</span>
             }
