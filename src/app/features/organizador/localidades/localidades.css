@@ -1,0 +1,45 @@
+.encabezado {
+  margin-bottom: var(--space-5);
+}
+
+.encabezado h1 {
+  margin: 0;
+}
+
+.form-localidad {
+  margin-bottom: var(--space-5);
+}
+
+/* Localidad y provincia lado a lado (una abajo de la otra en celular) */
+.form-fila {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-4);
+}
+
+.acciones {
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* Botones de solo ícono (lápiz y tacho) */
+.btn-icono {
+  padding: var(--space-2);
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.btn-icono:hover {
+  background-color: var(--color-surface-alt);
+}
+
+.btn-icono.peligro {
+  color: var(--color-danger);
+}
+
+.btn-icono.peligro:hover {
+  background-color: var(--estado-cancelado-bg);
+}
