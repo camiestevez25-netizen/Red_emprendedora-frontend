@@ -1,0 +1,20 @@
+.error-pagina {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-top: var(--space-8);
+}
+
+/* El "404" grande del diseño */
+.error-codigo {
+  margin: 0 0 var(--space-2);
+  font-family: var(--font-title);
+  font-size: clamp(64px, 12vw, 96px);
+  line-height: 1;
+  color: var(--color-primary);
+}
+
+.error-pagina .btn {
+  margin-top: var(--space-3);
+}
