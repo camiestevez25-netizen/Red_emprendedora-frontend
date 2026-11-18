@@ -1,0 +1,10 @@
+<app-modal-confirmacion
+  [abierto]="abierto()"
+  [titulo]="titulo()"
+  [mensaje]="mensaje()"
+  textoConfirmar="Sí, cancelar feria"
+  tipo="peligro"
+  [cargando]="procesando() || ocupados() === null"
+  [error]="error()"
+  (confirmar)="confirmar()"
+  (cancelar)="cerrar.emit()" />

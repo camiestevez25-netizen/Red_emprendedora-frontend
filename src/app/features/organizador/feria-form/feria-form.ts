@@ -10,13 +10,15 @@ import { Localidad } from '../../../core/models/localidad.model';
 import { leerError } from '../../../core/utils/api-error.util';
 import { BadgeEstado } from '../../../shared/components/badge-estado/badge-estado';
 import { ErrorCampo } from '../../../shared/components/error-campo/error-campo';
+import { CancelarFeria } from '../../../shared/components/cancelar-feria/cancelar-feria';
+import { StandService } from '../../../core/services/stand.service';
 
 // Igual que EventoRequest, pero la localidad arranca sin elegir
 type DatosFeria = Omit<EventoRequest, 'idLocalidad'> & { idLocalidad: number | null };
 
 @Component({
   selector: 'app-feria-form',
-  imports: [FormsModule, RouterLink, BadgeEstado, ErrorCampo],
+  imports: [FormsModule, RouterLink, BadgeEstado, ErrorCampo, CancelarFeria],
   templateUrl: './feria-form.html',
   styleUrl: './feria-form.css',
 })
@@ -25,6 +27,7 @@ export class FeriaForm {
   private readonly auth = inject(AuthService);
   private readonly localidadService = inject(LocalidadService);  private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
+  private readonly standService = inject(StandService);
 
   // /organizador/ferias/nueva -> null ; /organizador/ferias/7/editar -> 7
   readonly id = Number(this.route.snapshot.paramMap.get('id')) || null;
@@ -46,6 +49,11 @@ export class FeriaForm {
   readonly mensajeError = signal('');
   readonly mensajeOk = signal('');
   readonly errores = signal<Record<string, string>>({});
+  readonly modalCancelar = signal(false);
+  readonly ocupados = signal(0);
+
+  // Con stands reservados el backend no deja cambiar los m²
+  readonly metrosBloqueados = computed(() => this.ocupados() > 0);
 
   readonly cancelada = computed(() => this.evento()?.estado === 'Cancelado');
   readonly noEsMia = computed(() => {
@@ -112,11 +120,19 @@ export class FeriaForm {
         };
         this.evento.set(e);
         this.cargando.set(false);
+        this.contarOcupados();
       },
       error: (err: HttpErrorResponse) => {
         this.cargando.set(false);
         this.mensajeError.set(leerError(err).mensaje);
       },
+    });
+  }
+
+  // GET /stands/evento/{id}/contar-ocupados
+  private contarOcupados(): void {
+    this.standService.contarOcupados(this.id!).subscribe({
+      next: (n) => this.ocupados.set(n),
     });
   }
 
@@ -148,4 +164,18 @@ export class FeriaForm {
     this.mensajeError.set(mensaje);
     this.errores.set(errores);
   }
+
+  // Si la feria quedó Cancelada, se recarga y el formulario pasa a solo lectura.
+  // Si se eliminó, ya no existe: se vuelve al panel.
+  feriaCancelada(mensaje: string): void {
+    this.modalCancelar.set(false);
+    this.eventoService.obtener(this.id!).subscribe({
+      next: (e) => {
+        this.evento.set(e);
+        this.mensajeOk.set(mensaje);
+      },
+      error: () => this.router.navigate(['/organizador']),
+    });
+  }
+
 }

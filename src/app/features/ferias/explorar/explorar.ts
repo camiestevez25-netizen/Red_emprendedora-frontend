@@ -8,10 +8,11 @@ import { TarjetaFeria } from '../../../shared/components/tarjeta-feria/tarjeta-f
 import { claveFecha } from '../../../shared/utils/fechas';
 import { LocalidadService } from '../../../core/services/localidad.service';
 import { Localidad } from '../../../core/models/localidad.model';
+import { Paginador } from '../../../shared/components/paginador/paginador';
 
 @Component({
   selector: 'app-explorar',
-  imports: [FormsModule, TarjetaFeria],
+  imports: [FormsModule, TarjetaFeria, Paginador],
   templateUrl: './explorar.html',
   styleUrl: './explorar.css',
 })
@@ -34,7 +35,17 @@ export class Explorar {
     const texto = normalizar(this.busqueda());
     return this.eventos()
       .filter((e) => !texto || normalizar(e.nombre).includes(texto))
-      .sort((a, b) => claveFecha(a.fechaInicio) - claveFecha(b.fechaInicio));  });
+      .sort((a, b) => claveFecha(a.fechaInicio) - claveFecha(b.fechaInicio));  
+    });
+
+  // Paginacion en el front (devuelve la lista completa)
+  readonly tamanio = 9;
+  readonly pagina = signal(0);
+  readonly totalPaginas = computed(() => Math.ceil(this.filtradas().length / this.tamanio));
+  readonly visibles = computed(() => {
+    const inicio = this.pagina() * this.tamanio;
+    return this.filtradas().slice(inicio, inicio + this.tamanio);
+  });
 
   // Hay algún filtro puesto (para mostrar "Limpiar filtros")
   readonly hayFiltros = computed(
@@ -59,6 +70,16 @@ export class Explorar {
     this.cargar();
   }
 
+    buscar(texto: string): void {
+    this.busqueda.set(texto);
+    this.pagina.set(0); // al cambiar la búsqueda se vuelve a la primera página
+  }
+
+  irAPagina(n: number): void {
+    this.pagina.set(n);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
   limpiarFiltros(): void {
     const recargar = this.estado() !== '' || this.idLocalidad() !== null;
     this.busqueda.set('');
@@ -69,6 +90,7 @@ export class Explorar {
 
   // GET /api/eventos con los filtros del backend (estado; después también localidad)
   cargar(): void {
+    this.pagina.set(0); // cambió un filtro, vueve a la pagina 1
     this.cargando.set(true);
     this.mensajeError.set('');
 
