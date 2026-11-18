@@ -5,14 +5,14 @@ import { environment } from '../../../environments/environment';
 import { Page } from '../models/page.model';
 import { Stand, StandFiltro, StandRequest } from '../models/stand.model';
 
-
+// Paginación de GET /api/stands (page empieza en 0). sort: "numeroStand,asc"
 export interface PaginacionStand {
   page?: number;
   size?: number;
   sort?: string;
 }
 
-
+// Cuántos stands de una feria están ocupados y cuántos hay en total
 export interface OcupacionStands {
   ocupados: number;
   total: number;
@@ -23,7 +23,8 @@ export class StandService {
   private readonly http = inject(HttpClient);
   private readonly url = `${environment.apiUrl}/stands`;
 
-  
+  // GET /api/stands?idEvento=&estadoStand=&numeroStand=&nombreEvento=&idUsuario=&page=&size=&sort=
+  // Devuelve un Page<Stand> de Spring (usar content, totalElements, totalPages…)
   listar(filtro: StandFiltro = {}, paginacion: PaginacionStand = {}): Observable<Page<Stand>> {
     let params = new HttpParams();
     if (filtro.idEvento != null) params = params.set('idEvento', filtro.idEvento);
@@ -52,18 +53,34 @@ export class StandService {
     return this.http.put<Stand>(`${this.url}/${id}`, stand);
   }
 
+  // DELETE /api/stands/{id}. Responde 204 sin cuerpo
+  eliminar(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.url}/${id}`);
+  }
+
+  // PUT /api/stands/{id}/reservar?idUsuario=. El backend pide el idUsuario como parámetro
+  // (sale de AuthService.usuarioActual().idUsuario). Devuelve el stand ya reservado
+  reservar(id: number, idUsuario: number): Observable<Stand> {
+    const params = new HttpParams().set('idUsuario', idUsuario);
+    return this.http.put<Stand>(`${this.url}/${id}/reservar`, null, { params });
+  }
+
+  // PUT /api/stands/{id}/cancelar-reserva. Devuelve el stand ya liberado
+  cancelarReserva(id: number): Observable<Stand> {
+    return this.http.put<Stand>(`${this.url}/${id}/cancelar-reserva`, null);
+  }
+
+  // GET /api/stands/evento/{idEvento}/contar-ocupados. Responde un número suelto
+  contarOcupados(idEvento: number): Observable<number> {
+    return this.http.get<number>(`${this.url}/evento/${idEvento}/contar-ocupados`);
+  }
+
   // Ocupación de una feria: { ocupados, total }.
-  // Pide dos páginas de 1 elemento y usa solo totalElements, así no baja todos los stands.
+  // ocupados sale de contar-ocupados; total es el totalElements de GET /stands?idEvento=&size=1
   ocupacion(idEvento: number): Observable<OcupacionStands> {
-    const solo1 = { page: 0, size: 1 };
     return forkJoin({
-      total: this.listar({ idEvento }, solo1),
-      ocupados: this.listar({ idEvento, estadoStand: false }, solo1),
-    }).pipe(
-      map(({ total, ocupados }) => ({
-        ocupados: ocupados.totalElements,
-        total: total.totalElements,
-      })),
-    );
+      ocupados: this.contarOcupados(idEvento),
+      total: this.listar({ idEvento }, { page: 0, size: 1 }).pipe(map((p) => p.totalElements)),
+    });
   }
 }
