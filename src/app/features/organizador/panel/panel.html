@@ -33,10 +33,9 @@
         <strong>{{ agotadas() }}</strong>
         <span class="text-muted">Agotadas</span>
       </div>
-      <!-- Se completa cuando Cami suba StandService.ocupacion -->
       <div class="card numero">
         <span class="icon icon-lg" aria-hidden="true">storefront</span>
-        <strong>—</strong>
+        <strong>{{ ocupacionLista() ? standsTotales() : '-' }}</strong>
         <span class="text-muted">Stands totales</span>
       </div>
     </div>
@@ -66,6 +65,14 @@
             <app-badge-estado [estado]="f.estado" />
             <!-- Acá va la ocupación (ocupados / total) cuando esté StandService -->
             <a class="btn btn-secondary btn-sm" [routerLink]="['/organizador/ferias', f.id, 'stands']">Gestionar</a>
+            @if (ocupaciones()[f.id]; as o) {
+              <div class="ocupacion">
+                <span class="text-small text-muted">{{ o.ocupados }} de {{ o.total }} stands ocupados</span>
+                <div class="barra" aria-hidden="true">
+                  <div class="relleno" [style.width.%]="o.total ? (o.ocupados * 100) / o.total : 0"></div>
+                </div>
+              </div>
+            }
           </div>
         </article>
       } @empty {

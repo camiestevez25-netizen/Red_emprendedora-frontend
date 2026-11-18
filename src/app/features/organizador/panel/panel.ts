@@ -8,6 +8,9 @@ import { leerError } from '../../../core/utils/api-error.util';
 import { BadgeEstado } from '../../../shared/components/badge-estado/badge-estado';
 import { RangoFechasPipe } from '../../../shared/pipes/rango-fechas-pipe';
 import { claveFecha, claveHoy } from '../../../shared/utils/fechas';
+import { Observable, forkJoin } from 'rxjs';
+import { OcupacionStands, StandService } from '../../../core/services/stand.service';
+
 
 @Component({
   selector: 'app-panel',
@@ -18,12 +21,19 @@ import { claveFecha, claveHoy } from '../../../shared/utils/fechas';
 export class Panel {
   private readonly auth = inject(AuthService);
   private readonly eventoService = inject(EventoService);
+  private readonly standService = inject(StandService);
 
   readonly nombre = computed(() => this.auth.usuarioActual()?.nombre ?? '');
   readonly ferias = signal<Evento[]>([]);
   readonly cargando = signal(true);
   readonly mensajeError = signal('');
 
+  // Ocupacion de stands por feria, para mostrar en el panel
+  readonly ocupaciones = signal<Record<string, OcupacionStands>>({});
+  readonly ocupacionLista = signal(false);
+  readonly standsTotales = computed (() => 
+    Object.values(this.ocupaciones()).reduce((suma, o) => suma + o.total, 0),
+  );
   readonly total = computed(() => this.ferias().length);
   readonly activas = computed(() => this.ferias().filter((f) => f.estado === 'Activo').length);
   readonly agotadas = computed(() => this.ferias().filter((f) => f.estado === 'Agotado').length);
@@ -51,12 +61,33 @@ export class Panel {
       next: (lista) => {
         this.ferias.set(lista);
         this.cargando.set(false);
+        this.cargarOcupacion(lista);
       },
       error: (err: HttpErrorResponse) => {
         this.ferias.set([]);
         this.cargando.set(false);
         this.mensajeError.set(leerError(err).mensaje);
       },
+    });
+  }
+
+  // Pide la ocupacion de todas als ferias a la vez y espera a que lleguen todas
+  private cargarOcupacion(lista: Evento[]): void {
+    this.ocupaciones.set({});
+    this.ocupacionLista.set(false);
+    if (lista.length === 0) {
+      this.ocupacionLista.set(true);
+      return;
+    }
+    const pedidos: Record<string, Observable<OcupacionStands>> = {};
+    for (const f of lista) pedidos[f.id] = this.standService.ocupacion(f.id);
+
+    forkJoin(pedidos).subscribe({
+      next: (resultado) => {
+        this.ocupaciones.set(resultado);
+        this.ocupacionLista.set(true);
+      },
+      error: () => this.ocupacionLista.set(false),
     });
   }
 }

@@ -9,13 +9,14 @@ import { Evento, EventoRequest, EventoUpdate } from '../../../core/models/evento
 import { Localidad } from '../../../core/models/localidad.model';
 import { leerError } from '../../../core/utils/api-error.util';
 import { BadgeEstado } from '../../../shared/components/badge-estado/badge-estado';
+import { ErrorCampo } from '../../../shared/components/error-campo/error-campo';
 
 // Igual que EventoRequest, pero la localidad arranca sin elegir
 type DatosFeria = Omit<EventoRequest, 'idLocalidad'> & { idLocalidad: number | null };
 
 @Component({
   selector: 'app-feria-form',
-  imports: [FormsModule, RouterLink, BadgeEstado],
+  imports: [FormsModule, RouterLink, BadgeEstado, ErrorCampo],
   templateUrl: './feria-form.html',
   styleUrl: './feria-form.css',
 })

@@ -6,6 +6,7 @@ import { Panel } from './panel';
 import { AuthService } from '../../../core/services/auth.service';
 import { EventoService } from '../../../core/services/evento.service';
 import { Evento } from '../../../core/models/evento.model';
+import {StandService } from '../../../core/services/stand.service';
 
 function feria(id: number, estado: Evento['estado'], inicio: string, fin: string): Evento {
   return { id, nombre: `Feria ${id}`, estado, fechaInicio: inicio, fechaFin: fin } as Evento;
@@ -38,6 +39,7 @@ describe('Panel', () => {
             },
           },
         },
+        { provide: StandService, useValue: { ocupacion: (id: number) => of({ ocupados: id, total: 10 }) } },
       ],
     });
     panel = TestBed.createComponent(Panel).componentInstance;
@@ -55,5 +57,11 @@ describe('Panel', () => {
 
   it('muestra las 3 próximas sin canceladas ni terminadas, ordenadas por fecha', () => {
     expect(panel.proximas().map((f) => f.id)).toEqual([2, 5, 6]);
+  });
+
+  it('suma los stands de todas las ferias y guarda la ocupación de cada una', () => {
+  expect(panel.ocupacionLista()).toBe(true);
+  expect(panel.standsTotales()).toBe(60); // 6 ferias x 10 stands
+  expect(panel.ocupaciones()[2]).toEqual({ ocupados: 2, total: 10 });
   });
 });
