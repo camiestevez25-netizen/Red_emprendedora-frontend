@@ -1,6 +1,52 @@
+/* Fondo decorativo: ocupa todo el ancho de la página */
+.login-fondo {
+  position: relative;
+  overflow: hidden;
+  min-height: 100vh; //ACA SE CAMBIA LA ALTURA
+}
+
+.login-toldo {
+  --franja: 32px;
+  height: calc(var(--franja) * 1.5);
+  background: repeating-linear-gradient(
+    90deg,
+    var(--color-primary) 0 var(--franja),
+    var(--color-secondary) var(--franja) calc(var(--franja) * 2)
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) top / 100% var(--franja) no-repeat,
+    radial-gradient(circle calc(var(--franja) / 2) at 50% var(--franja), #000 98%, transparent) top left / var(--franja) 100% repeat-x;
+  mask:
+    linear-gradient(#000 0 0) top / 100% var(--franja) no-repeat,
+    radial-gradient(circle calc(var(--franja) / 2) at 50% var(--franja), #000 98%, transparent) top left / var(--franja) 100% repeat-x;
+}
+
+.login-bloques {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-4);
+  pointer-events: none;
+}
+
+.bloque {
+  display: block;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.bloque-crema { width: 200px; height: 120px; background: var(--color-surface-alt); }
+.bloque-oliva { width: 120px; height: 220px; background: var(--color-accent); }
+.bloque-tinta { width: 200px; height: 340px; background: var(--color-text); border-top-right-radius: 0; }
+
+/* El login va por encima de la decoración */
 .login {
+  position: relative;
+  z-index: 1;
   display: flex;
   justify-content: center;
+  padding-top: var(--space-7);
 }
 
 .login-card {
@@ -61,6 +107,27 @@
 }
 
 @media (max-width: 768px) {
+  .login-fondo {
+    min-height: 0;
+    padding-bottom: 140px; /* lugar para los bloques debajo de la tarjeta */
+  }
+
+  .login-toldo {
+    --franja: 16px;
+  }
+
+  .login {
+    padding-top: var(--space-5);
+  }
+
+  .login-bloques {
+    gap: var(--space-2);
+  }
+
+  .bloque-crema { width: 96px; height: 56px; }
+  .bloque-oliva { width: 56px; height: 100px; }
+  .bloque-tinta { width: 96px; height: 140px; }
+
   .login-card .card-body {
     padding: var(--space-5);
   }
