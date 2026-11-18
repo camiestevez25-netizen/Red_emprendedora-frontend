@@ -92,6 +92,10 @@
       </fieldset>
 
       <div class="card-body acciones">
+        @if (esEdicion && !soloLectura()) {
+          <button type="button" class="btn btn-outline-danger" (click)="modalCancelar.set(true)">Cancelar feria</button>
+
+        }
         <a class="btn btn-secondary" routerLink="/organizador">
           {{ soloLectura() ? 'Volver' : 'Cancelar' }}
         </a>
@@ -103,4 +107,10 @@
       </div>
     </form>
   }
+
+    @if (evento(); as e) {
+    <app-cancelar-feria [evento]="e" [abierto]="modalCancelar()"
+                        (cerrar)="modalCancelar.set(false)" (cancelada)="feriaCancelada($event)" />
+  }
+
 </section>
