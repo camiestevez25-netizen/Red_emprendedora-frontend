@@ -1,5 +1,132 @@
-<!-- Pantalla vacía: la completa Lou -->
- <section class="container page">
+<section class="container page">
+  <div class="flex-between encabezado">
     <h1>Localidades</h1>
-    <p class="text-muted">Pantalla en contrucción.</p>
- </section>
+    @if (!formAbierto()) {
+      <button type="button" class="btn btn-primary" (click)="nueva()">
+        Agregar localidad
+        <span class="icon">add</span>
+      </button>
+    }
+  </div>
+
+  @if (mensajeOk()) {
+    <div class="alert alert-success">{{ mensajeOk() }}</div>
+  }
+
+  <!-- Formulario de alta / edición -->
+  @if (formAbierto()) {
+    <form class="card form-localidad" #form="ngForm" (ngSubmit)="guardar(form)" novalidate>
+      <div class="card-body">
+        <h2>{{ editando() ? 'Editar localidad' : 'Nueva localidad' }}</h2>
+
+        @if (errorForm()) {
+          <div class="alert alert-error">{{ errorForm() }}</div>
+        }
+
+        <div class="form-fila">
+          <div class="form-group">
+            <label for="nombreLocalidad">Localidad *</label>
+            <input
+              id="nombreLocalidad"
+              name="nombreLocalidad"
+              type="text"
+              placeholder="Ej. Tandil"
+              maxlength="50"
+              required
+              [pattern]="soloLetras"
+              [(ngModel)]="datos.nombreLocalidad"
+              #nombre="ngModel"
+            />
+            @if ((nombre.touched || form.submitted) && nombre.errors?.['required']) {
+              <span class="form-error">Ingresá el nombre de la localidad.</span>
+            }
+            @if ((nombre.touched || form.submitted) && nombre.errors?.['pattern']) {
+              <span class="form-error">Solo puede contener letras.</span>
+            }
+            <app-error-campo [errores]="errores()" campo="nombreLocalidad" />
+          </div>
+
+          <div class="form-group">
+            <label for="provinciaLocalidad">Provincia *</label>
+            <input
+              id="provinciaLocalidad"
+              name="provinciaLocalidad"
+              type="text"
+              placeholder="Ej. Buenos Aires"
+              maxlength="50"
+              required
+              [pattern]="soloLetras"
+              [(ngModel)]="datos.provinciaLocalidad"
+              #provincia="ngModel"
+            />
+            @if ((provincia.touched || form.submitted) && provincia.errors?.['required']) {
+              <span class="form-error">Ingresá la provincia.</span>
+            }
+            @if ((provincia.touched || form.submitted) && provincia.errors?.['pattern']) {
+              <span class="form-error">Solo puede contener letras.</span>
+            }
+            <app-error-campo [errores]="errores()" campo="provinciaLocalidad" />
+          </div>
+        </div>
+
+        <div class="flex">
+          <button type="submit" class="btn btn-primary" [disabled]="guardando()">
+            {{ guardando() ? 'Guardando…' : editando() ? 'Guardar cambios' : 'Agregar' }}
+          </button>
+          <button type="button" class="btn btn-secondary" [disabled]="guardando()" (click)="cerrarFormulario()">
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </form>
+  }
+
+  <!-- Lista -->
+  @if (cargando()) {
+    <p class="text-muted">Cargando localidades…</p>
+  } @else if (mensajeError()) {
+    <div class="alert alert-error">{{ mensajeError() }}</div>
+  } @else if (localidades().length === 0) {
+    <p class="text-muted">Todavía no hay localidades cargadas.</p>
+  } @else {
+    <div class="card table-wrapper">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Localidad</th>
+            <th>Provincia</th>
+            <th aria-label="Acciones"></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (l of localidades(); track l.idLocalidad) {
+            <tr>
+              <td>{{ l.nombreLocalidad }}</td>
+              <td>{{ l.provinciaLocalidad }}</td>
+              <td class="acciones">
+                <button type="button" class="btn-icono" [attr.aria-label]="'Editar ' + l.nombreLocalidad" (click)="editar(l)">
+                  <span class="icon">edit</span>
+                </button>
+                <button type="button" class="btn-icono peligro" [attr.aria-label]="'Eliminar ' + l.nombreLocalidad" (click)="pedirEliminar(l)">
+                  <span class="icon">delete</span>
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>
+
+<app-modal-confirmacion
+  [abierto]="aEliminar() !== null"
+  titulo="¿Eliminar localidad?"
+  [mensaje]="mensajeEliminar()"
+  textoConfirmar="Eliminar"
+  tipo="peligro"
+  [cargando]="eliminando()"
+  [error]="errorEliminar()"
+  (confirmar)="eliminar()"
+  (cancelar)="cancelarEliminar()"
+/>
