@@ -55,4 +55,15 @@ describe('Explorar', () => {
     c.limpiarFiltros();
     expect(ultimoFiltro).toEqual({});
   });
+
+  it('muestra 9 ferias por página', () => {
+    const c = TestBed.createComponent(Explorar).componentInstance;
+    c.eventos.set(Array.from({ length: 10 }, (_, i) => feria(i + 1, `Feria ${i + 1}`, `2026-5-${i + 1}`)));
+    
+    expect(c.totalPaginas()).toBe(2);
+    expect(c.visibles().length).toBe(9);
+    
+    c.pagina.set(1);
+    expect(c.visibles().map((e) => e.id)).toEqual([10]);
+  });
 });

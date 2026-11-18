@@ -435,7 +435,30 @@ textarea.ng-invalid.ng-touched {
 .icon-sm { font-size: 16px; }
 .icon-lg { font-size: 28px; }
 
-/* ---------- 13. Responsive ---------- */
+/* ---------- 13. Ilustraciones ---------- */
+/* Guarda de toldo: franjas verde / salvia con festones.
+   Uso: <div class="guarda-toldo"></div>
+   Tamaño: cambiá --franja (por defecto 24px). Alto total = franja × 1,5 */
+.guarda-toldo {
+  --franja: 24px;
+  height: clac(var(--franja) * 1.5);
+  background: repeating-liner-gradient(
+    90deg,
+    var(--color-primary) 0 var(--franja),
+    var(--color-secondary) var(--franja) calc(var(--franja) * 2)
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) top / 100% var(--franja) no-repeat,
+    radial-gradient(circle calc(var(--franja) / 2) at 50% var(--franja), #000 98%, transparent) top left / var(--franja) 100% repeat-x;
+  mask:
+    linear-gradient(#000 0 0) top / 100% var(--franja) no-repeat,
+    radial-gradient(circle calc(var(--franja) / 2) at 50% var(--franja), #000 98%, transparent) top left / var(--franja) 100% repeat-x;
+}
+
+.guarda-toldo-sm { --franja: 12px; }
+.guarda-toldo-lg { --franja: 40px; }
+
+/* ---------- 14. Responsive ---------- */
 @media (max-width: 768px) {
   .container { padding: 0 var(--space-4); }
   .page { padding-top: var(--space-5); padding-bottom: var(--space-6); }
