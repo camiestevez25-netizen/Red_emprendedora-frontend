@@ -1,5 +1,74 @@
-<!-- Pantalla vacía: la completa Lou -->
- <section class="container page">
-    <h1>Inicio</h1>
-    <p class="text-muted">Pantalla en contrucción.</p>
- </section>
+<!-- Hero -->
+<section class="container hero">
+  <div class="hero-texto">
+    <h1>Red Emprendedora</h1>
+    <p class="hero-subtitulo">Ferias de emprendedores en toda Argentina</p>
+    <p>Conectá con ferias, reservá tu stand y hacé crecer tu emprendimiento.</p>
+
+    <div class="flex hero-botones">
+      <a routerLink="/ferias" class="btn btn-primary">
+        Explorar ferias
+        <span class="icon icon-sm" aria-hidden="true">arrow_forward</span>
+      </a>
+      @if (!auth.estaLogueado()) {
+        <a routerLink="/registro" class="btn btn-secondary">Registrate gratis</a>
+      }
+    </div>
+  </div>
+
+  <div class="hero-foto">
+    @if (!fotoFallo()) {
+      <img src="img/inicio-hero.jpg" alt="Puestos de una feria de emprendedores" (error)="fotoFallo.set(true)" />
+    } @else {
+      <span class="icon" aria-hidden="true">storefront</span>
+    }
+  </div>
+</section>
+
+<!-- ¿Cómo funciona? (el navbar y el footer llevan acá con /#como-funciona) -->
+<section id="como-funciona" class="container">
+  <div class="panel como-funciona">
+    <h2 class="como-titulo">¿Cómo funciona?</h2>
+
+    <div class="como-item">
+      <span class="icon icon-lg" aria-hidden="true">storefront</span>
+      <div>
+        <h3>Para emprendedores</h3>
+        <p class="text-muted text-small">Mostrá y vendé tus productos: elegí una feria y reservá tu stand.</p>
+      </div>
+    </div>
+
+    <div class="como-item">
+      <span class="icon icon-lg" aria-hidden="true">groups</span>
+      <div>
+        <h3>Para organizadores</h3>
+        <p class="text-muted text-small">Creá y gestioná tus ferias, sus stands y las reservas.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Próximas ferias -->
+<section class="container page proximas">
+  <div class="flex-between">
+    <h2>Próximas ferias</h2>
+    <a routerLink="/ferias" class="ver-todas">
+      Ver todas las ferias
+      <span class="icon icon-sm" aria-hidden="true">arrow_forward</span>
+    </a>
+  </div>
+
+  @if (cargando()) {
+    <p class="text-muted">Cargando ferias…</p>
+  } @else if (mensajeError()) {
+    <div class="alert alert-error">{{ mensajeError() }}</div>
+  } @else if (proximas().length === 0) {
+    <p class="text-muted">Por ahora no hay ferias próximas. ¡Volvé pronto!</p>
+  } @else {
+    <div class="grid">
+      @for (evento of proximas(); track evento.id) {
+        <app-tarjeta-feria [evento]="evento" variante="horizontal" />
+      }
+    </div>
+  }
+</section>
