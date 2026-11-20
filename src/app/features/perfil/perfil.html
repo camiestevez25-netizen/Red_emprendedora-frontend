@@ -1,5 +1,281 @@
-<!-- Pantalla vacía: la completa Canu -->
- <section class="container page">
+<section class="container page perfil">
+  <!-- Menú lateral -->
+  <aside class="perfil-menu card">
+    <div class="perfil-avatar" aria-hidden="true">{{ iniciales() }}</div>
+    <nav aria-label="Secciones del perfil">
+      <a routerLink="/perfil" fragment="datos-personales" class="perfil-enlace">
+        <span class="icon">person</span> Datos personales
+      </a>
+      @if (esEmprendedor()) {
+        <a routerLink="/perfil" fragment="mi-emprendimiento" class="perfil-enlace">
+          <span class="icon">storefront</span> Mi emprendimiento
+        </a>
+      }
+      <a routerLink="/mis-reservas" class="perfil-enlace">
+        <span class="icon">confirmation_number</span> Mis reservas
+      </a>
+      @if (esOrganizador()) {
+        <a routerLink="/organizador" class="perfil-enlace">
+          <span class="icon">dashboard</span> Mi panel
+        </a>
+      }
+    </nav>
+  </aside>
+
+  <div class="perfil-contenido">
     <h1>Mi perfil</h1>
-    <p class="text-muted">Pantalla en contrucción.</p>
- </section>
+
+    @if (cargando()) {
+      <p class="text-muted">Cargando tus datos…</p>
+    } @else {
+      @if (mensajeExito()) {
+        <div class="alert alert-success" role="status">
+          {{ mensajeExito() }}
+          @if (cambiaronRoles()) {
+            Para ver las opciones de tu nuevo rol en el menú, volvé a iniciar sesión.
+            <button
+              type="button"
+              class="btn btn-secondary btn-sm perfil-reingresar"
+              (click)="volverAEntrar()"
+            >
+              Volver a iniciar sesión
+            </button>
+          }
+        </div>
+      }
+      @if (mensajeError()) {
+        <div class="alert alert-error" role="alert">{{ mensajeError() }}</div>
+      }
+
+      <form
+        #form="ngForm"
+        (ngSubmit)="form.valid && rolesElegidos().length > 0 && guardar()"
+        novalidate
+      >
+        <!-- Datos personales -->
+        <div class="card perfil-seccion" id="datos-personales">
+          <div class="card-body">
+            <h2>Datos personales</h2>
+
+            <div class="perfil-fila">
+              <div class="form-group">
+                <label for="nombre">Nombre completo</label>
+                <input
+                  id="nombre"
+                  type="text"
+                  name="nombre"
+                  autocomplete="name"
+                  maxlength="50"
+                  [(ngModel)]="datos.nombre"
+                  #nombre="ngModel"
+                  required
+                />
+                @if ((nombre.touched || form.submitted) && nombre.errors?.['required']) {
+                  <span class="form-error">Ingresá tu nombre</span>
+                }
+                <app-error-campo [errores]="errores()" campo="nombre" />
+              </div>
+
+              <div class="form-group">
+                <label for="email">Email</label>
+                <input
+                  id="email"
+                  type="email"
+                  name="email"
+                  autocomplete="email"
+                  maxlength="50"
+                  [(ngModel)]="datos.email"
+                  #email="ngModel"
+                  required
+                  email
+                />
+                @if ((email.touched || form.submitted) && email.errors?.['required']) {
+                  <span class="form-error">Ingresá tu email</span>
+                } @else if ((email.touched || form.submitted) && email.errors?.['email']) {
+                  <span class="form-error">El email no tiene un formato válido</span>
+                }
+                <app-error-campo [errores]="errores()" campo="email" />
+              </div>
+            </div>
+
+            <div class="perfil-fila">
+              <div class="form-group">
+                <label for="telefono">Teléfono</label>
+                <input
+                  id="telefono"
+                  type="tel"
+                  name="telefono"
+                  autocomplete="tel"
+                  maxlength="15"
+                  [(ngModel)]="datos.telefono"
+                  #telefono="ngModel"
+                  required
+                />
+                @if ((telefono.touched || form.submitted) && telefono.errors?.['required']) {
+                  <span class="form-error">Ingresá tu teléfono</span>
+                }
+                <app-error-campo [errores]="errores()" campo="telefono" />
+              </div>
+
+              <div class="form-group">
+                <label for="direccion">Dirección</label>
+                <input
+                  id="direccion"
+                  type="text"
+                  name="direccion"
+                  autocomplete="street-address"
+                  maxlength="50"
+                  [(ngModel)]="datos.direccion"
+                  #direccion="ngModel"
+                  required
+                />
+                @if ((direccion.touched || form.submitted) && direccion.errors?.['required']) {
+                  <span class="form-error">Ingresá tu dirección</span>
+                }
+                <app-error-campo [errores]="errores()" campo="direccion" />
+              </div>
+            </div>
+
+            <div class="perfil-fila">
+              <div class="form-group">
+                <label for="localidad">Localidad</label>
+                <select
+                  id="localidad"
+                  name="idLocalidad"
+                  [(ngModel)]="datos.idLocalidad"
+                  #localidad="ngModel"
+                  required
+                >
+                  <option [ngValue]="null" disabled>Elegí tu localidad</option>
+                  @for (loc of localidades(); track loc.idLocalidad) {
+                    <option [ngValue]="loc.idLocalidad">
+                      {{ loc.nombreLocalidad }}, {{ loc.provinciaLocalidad }}
+                    </option>
+                  }
+                </select>
+                @if ((localidad.touched || form.submitted) && localidad.errors?.['required']) {
+                  <span class="form-error">Elegí tu localidad</span>
+                }
+                <app-error-campo [errores]="errores()" campo="idLocalidad" />
+              </div>
+
+              <div class="form-group">
+                <label for="contrasena"
+                  >Nueva contraseña <span class="text-muted">(opcional)</span></label
+                >
+                <input
+                  id="contrasena"
+                  type="password"
+                  name="contrasena"
+                  autocomplete="new-password"
+                  maxlength="50"
+                  [(ngModel)]="datos.contrasena"
+                  #contrasena="ngModel"
+                  minlength="6"
+                />
+                @if ((contrasena.touched || form.submitted) && contrasena.errors?.['minlength']) {
+                  <span class="form-error">La contraseña debe tener entre 6 y 50 caracteres</span>
+                } @else {
+                  <span class="form-help">Dejala vacía si no la querés cambiar.</span>
+                }
+                <app-error-campo [errores]="errores()" campo="contrasena" />
+              </div>
+            </div>
+
+            <fieldset class="perfil-roles">
+              <legend>Cómo usás Red Emprendedora</legend>
+              <label class="perfil-check">
+                <input
+                  type="checkbox"
+                  name="rolEmprendedor"
+                  [ngModel]="esEmprendedor()"
+                  (ngModelChange)="esEmprendedor.set($event)"
+                />
+                Emprendedor/a: reservo stands en ferias
+              </label>
+              <label class="perfil-check">
+                <input
+                  type="checkbox"
+                  name="rolOrganizador"
+                  [ngModel]="esOrganizador()"
+                  (ngModelChange)="esOrganizador.set($event)"
+                />
+                Organizador/a: publico y gestiono ferias
+              </label>
+              @if (rolesElegidos().length === 0) {
+                <span class="form-error">Elegí al menos una opción</span>
+              }
+              <app-error-campo [errores]="errores()" campo="roles" />
+            </fieldset>
+          </div>
+        </div>
+
+        <!-- Emprendimiento: solo si es emprendedora -->
+        @if (esEmprendedor()) {
+          <div class="card perfil-seccion" id="mi-emprendimiento">
+            <div class="card-body">
+              <h2>Mi emprendimiento</h2>
+
+              <div class="perfil-fila">
+                <div class="form-group">
+                  <label for="nombreEmprendimiento">Nombre del emprendimiento</label>
+                  <input
+                    id="nombreEmprendimiento"
+                    type="text"
+                    name="nombreEmprendimiento"
+                    maxlength="100"
+                    [(ngModel)]="datos.nombreEmprendimiento"
+                  />
+                  <app-error-campo [errores]="errores()" campo="nombreEmprendimiento" />
+                </div>
+
+                <div class="form-group">
+                  <label for="tipoEmprendimiento">Tipo de emprendimiento</label>
+                  <select
+                    id="tipoEmprendimiento"
+                    name="tipoEmprendimiento"
+                    [(ngModel)]="datos.tipoEmprendimiento"
+                  >
+                    <option value="">Elegí una opción</option>
+                    @for (tipo of tiposEmprendimiento; track tipo) {
+                      <option [value]="tipo">{{ tipo }}</option>
+                    }
+                    <!-- Si tenía guardado un tipo que no está en la lista, igual se muestra -->
+                    @if (
+                      datos.tipoEmprendimiento &&
+                      !tiposEmprendimiento.includes(datos.tipoEmprendimiento)
+                    ) {
+                      <option [value]="datos.tipoEmprendimiento">
+                        {{ datos.tipoEmprendimiento }}
+                      </option>
+                    }
+                  </select>
+                  <app-error-campo [errores]="errores()" campo="tipoEmprendimiento" />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="instagram">Instagram <span class="text-muted">(opcional)</span></label>
+                <input
+                  id="instagram"
+                  type="text"
+                  name="instagram"
+                  maxlength="100"
+                  placeholder="@tuemprendimiento"
+                  [(ngModel)]="datos.instagram"
+                />
+                <app-error-campo [errores]="errores()" campo="instagram" />
+              </div>
+            </div>
+          </div>
+        }
+
+        <div class="perfil-acciones">
+          <button type="submit" class="btn btn-primary" [disabled]="guardando()">
+            {{ guardando() ? 'Guardando…' : 'Guardar cambios' }}
+          </button>
+        </div>
+      </form>
+    }
+  </div>
+</section>
