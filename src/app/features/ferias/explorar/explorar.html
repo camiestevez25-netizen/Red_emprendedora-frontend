@@ -2,10 +2,15 @@
   <h1>Explora las ferias</h1>
 
   <div class="filtros">
-    <!-- Se habilita cuando Lou suba LocalidadService -->
-    <select name="localidad" aria-label="Filtrar por localidad" disabled>
-      <option>Todas las localidades</option>
+    <select name="localidad" aria-label="Filtrar por localidad"
+    [ngModel]="idLocalidad()"
+    (ngModelChange)="cambiarLocalidad($event)">
+    <option [ngValue]="null">Todas las localidades</option>>
+    @for (l of localidades(); track l.idLocalidad) {
+      <option [ngValue]="l.idLocalidad">{{ l.nombreLocalidad }}, {{ l.provinciaLocalidad}}</option>
+    }
     </select>
+
 
     <select name="estado" aria-label="Filtrar por estado" [ngModel]="estado()" (ngModelChange)="cambiarEstado($event)">
       <option value="">Todos los estados</option>
@@ -17,7 +22,7 @@
     <div class="buscador">
       <span class="icon" aria-hidden="true">search</span>
       <input type="text" name="busqueda" placeholder="Buscar feria…" aria-label="Buscar feria por nombre"
-             [(ngModel)]="busqueda" />
+             [ngModel]="busqueda()" (ngModelChange)="buscar($event)"/>
     </div>
   </div>
 
@@ -34,7 +39,7 @@
     </p>
 
     <div class="grid">
-      @for (e of filtradas(); track e.id) {
+      @for (e of visibles(); track e.id) {
         <app-tarjeta-feria [evento]="e" />
       } @empty {
         <div class="vacio">
@@ -46,6 +51,5 @@
         </div>
       }
     </div>
-    <!-- Acá va el paginador de Lou -->
-  }
+    <app-paginador [pagina]="pagina()" [totalPaginas]="totalPaginas()" (cambioPagina)="irAPagina($event)" />  }
 </section>

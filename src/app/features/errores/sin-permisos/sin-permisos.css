@@ -1,0 +1,18 @@
+.error-pagina {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-top: var(--space-8);
+}
+
+/* Candado del diseño */
+.error-icono {
+  margin-bottom: var(--space-3);
+  font-size: 64px;
+  color: var(--color-muted);
+}
+
+.error-pagina .btn {
+  margin-top: var(--space-3);
+}

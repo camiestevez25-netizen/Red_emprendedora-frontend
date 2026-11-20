@@ -30,7 +30,7 @@
           @if ((nombre.touched || form.submitted) && nombre.errors?.['required']) {
             <span class="form-error">El nombre es obligatorio.</span>
           }
-          @if (errores()['nombre']) { <span class="form-error">{{ errores()['nombre'] }}</span> }
+          <app-error-campo [errores]="errores()" campo="nombre" />
         </div>
 
         <div class="fila">
@@ -41,7 +41,7 @@
             @if ((fechaInicio.touched || form.submitted) && fechaInicio.errors?.['required']) {
               <span class="form-error">Elegí la fecha de inicio.</span>
             }
-            @if (errores()['fechaInicio']) { <span class="form-error">{{ errores()['fechaInicio'] }}</span> }
+            <app-error-campo [errores]="errores()" campo="fechaInicio" />
           </div>
 
           <div class="form-group">
@@ -51,7 +51,7 @@
             @if ((fechaFin.touched || form.submitted) && fechaFin.errors?.['required']) {
               <span class="form-error">Elegí la fecha de fin.</span>
             }
-            @if (errores()['fechaFin']) { <span class="form-error">{{ errores()['fechaFin'] }}</span> }
+            <app-error-campo [errores]="errores()" campo="fechaFin" />
           </div>
         </div>
 
@@ -62,17 +62,21 @@
                    [(ngModel)]="datos.precioEntrada" #precio="ngModel" />
             <span class="form-help">Vacío o 0 = entrada gratuita</span>
             @if (precio.value < 0) { <span class="form-error">El precio no puede ser negativo.</span> }
-            @if (errores()['precioEntrada']) { <span class="form-error">{{ errores()['precioEntrada'] }}</span> }
+            <app-error-campo [errores]="errores()" campo="precioEntrada" />
           </div>
 
           <div class="form-group">
             <label for="metrosCuadrados">Superficie (m²) *</label>
             <input id="metrosCuadrados" name="metrosCuadrados" type="text" maxlength="25" placeholder="Ej. 150"
-                   [(ngModel)]="datos.metrosCuadrados" #metros="ngModel" required />
+                   [(ngModel)]="datos.metrosCuadrados" #metros="ngModel" required
+                   [disabled]="metrosBloqueados()" />
+            @if (metrosBloqueados()) {
+              <span class="form-help">No se puede cambiar porque la feria ya tiene stands reservados.</span>
+            }
             @if ((metros.touched || form.submitted) && metros.errors?.['required']) {
               <span class="form-error">Indicá la superficie.</span>
             }
-            @if (errores()['metrosCuadrados']) { <span class="form-error">{{ errores()['metrosCuadrados'] }}</span> }
+            <app-error-campo [errores]="errores()" campo="metrosCuadrados" />
           </div>
         </div>
 
@@ -87,11 +91,15 @@
           @if ((localidad.touched || form.submitted) && localidad.errors?.['required']) {
             <span class="form-error">Elegí una localidad.</span>
           }
-          @if (errores()['idLocalidad']) { <span class="form-error">{{ errores()['idLocalidad'] }}</span> }
+          <app-error-campo [errores]="errores()" campo="idLocalidad" />
         </div>
       </fieldset>
 
       <div class="card-body acciones">
+        @if (esEdicion && !soloLectura()) {
+          <button type="button" class="btn btn-outline-danger" (click)="modalCancelar.set(true)">Cancelar feria</button>
+
+        }
         <a class="btn btn-secondary" routerLink="/organizador">
           {{ soloLectura() ? 'Volver' : 'Cancelar' }}
         </a>
@@ -103,4 +111,10 @@
       </div>
     </form>
   }
+
+    @if (evento(); as e) {
+    <app-cancelar-feria [evento]="e" [abierto]="modalCancelar()"
+                        (cerrar)="modalCancelar.set(false)" (cancelada)="feriaCancelada($event)" />
+  }
+
 </section>

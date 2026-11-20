@@ -1,5 +1,77 @@
-<!-- Pantalla vacía: la completa Cami -->
 <section class="container page">
+  <div class="encabezado">
     <h1>Mis reservas</h1>
-    <p class="text-muted">Pantalla en construcción.</p>
+    @if (total() > 0) {
+      <p class="text-muted">{{ total() }} {{ total() === 1 ? 'reserva' : 'reservas' }}</p>
+    }
+  </div>
+
+  @if (mensajeError()) {
+    <div class="alert alert-error" role="alert">
+      {{ mensajeError() }}
+      <button type="button" class="btn btn-secondary btn-sm" (click)="cargar(pagina())">
+        Reintentar
+      </button>
+    </div>
+  }
+
+  @if (mensajeOk()) {
+    <div class="alert alert-success" role="status">{{ mensajeOk() }}</div>
+  }
+
+  @if (cargando() && reservas().length === 0) {
+    <p class="text-muted">Cargando tus reservas…</p>
+  } @else if (reservas().length > 0) {
+    <div class="reservas">
+      @for (r of reservas(); track r.idStand) {
+        <article class="card reserva">
+          <div class="reserva-encabezado">
+            <a class="reserva-feria" [routerLink]="['/ferias', r.idEvento]">{{ r.nombreEvento }}</a>
+            <app-badge-estado [estado]="estadoFeria(r)" />
+          </div>
+
+          <p class="reserva-stand">Stand {{ r.numeroStand }}</p>
+          <span class="tag">{{ precio(r.costoStand) }}</span>
+
+          <div class="acciones">
+            <a class="btn btn-secondary btn-sm" [routerLink]="['/ferias', r.idEvento]">Ver feria</a>
+            @if (puedeCancelar(r)) {
+              <button
+                type="button"
+                class="btn btn-outline-danger btn-sm"
+                [attr.aria-label]="'Cancelar la reserva del stand ' + r.numeroStand"
+                (click)="pedirCancelar(r)"
+              >
+                Cancelar reserva
+              </button>
+            }
+          </div>
+        </article>
+      }
+    </div>
+
+    <app-paginador
+      [pagina]="pagina()"
+      [totalPaginas]="totalPaginas()"
+      (cambioPagina)="cargar($event)"
+    />
+  } @else if (!mensajeError()) {
+    <div class="card card-body vacio">
+      <span class="icon icon-lg" aria-hidden="true">storefront</span>
+      <p>Todavía no reservaste ningún stand.</p>
+      <a class="btn btn-primary" routerLink="/ferias">Explorá ferias</a>
+    </div>
+  }
+
+  <app-modal-confirmacion
+    [abierto]="standElegido() !== null"
+    [titulo]="'¿Cancelar la reserva del stand ' + (standElegido()?.numeroStand ?? '') + '?'"
+    [mensaje]="mensajeModal()"
+    textoConfirmar="Cancelar reserva"
+    tipo="peligro"
+    [cargando]="procesando()"
+    [error]="errorModal()"
+    (confirmar)="confirmarCancelacion()"
+    (cancelar)="cerrarModal()"
+  />
 </section>

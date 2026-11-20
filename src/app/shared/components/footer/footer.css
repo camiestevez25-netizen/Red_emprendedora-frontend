@@ -1,0 +1,47 @@
+.footer {
+  margin-top: var(--space-7);
+  padding: var(--space-4) 0;
+  background-color: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+}
+
+.footer-contenido {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.marca {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text);
+}
+
+.marca:hover {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.marca-texto {
+  font-family: var(--font-title);
+  line-height: 1.1;
+}
+
+.footer-dato {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.footer-dato a {
+  color: var(--color-text);
+}
+
+.footer-dato a:hover {
+  color: var(--color-primary);
+  text-decoration: none;
+}

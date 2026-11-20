@@ -8,8 +8,8 @@ import { Component, computed, input } from '@angular/core';
   styleUrl: './error-campo.css',
 })
 export class ErrorCampo {
-  readonly errores = input<Record<string, string>>({});
+  readonly errores = input<Record<string, string> | null>({});
   readonly campo = input.required<string>();
 
-  readonly mensaje = computed(() => this.errores()[this.campo()] ?? '');
+  readonly mensaje = computed(() => this.errores()?.[this.campo()] ?? '');
 }

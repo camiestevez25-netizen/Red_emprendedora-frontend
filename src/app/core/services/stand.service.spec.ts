@@ -83,21 +83,50 @@ describe('StandService', () => {
     req.flush({});
   });
 
-  it('ocupacion devuelve ocupados y total de la feria usando totalElements', () => {
+  it('eliminar hace DELETE /stands/{id}', () => {
+    service.eliminar(9).subscribe();
+    const req = http.expectOne(`${url}/9`);
+    expect(req.request.method).toBe('DELETE');
+    req.flush(null);
+  });
+
+  it('reservar hace PUT /stands/{id}/reservar con el idUsuario como parámetro', () => {
+    service.reservar(7, 5).subscribe();
+    const req = http.expectOne((r) => r.url === `${url}/7/reservar`);
+    expect(req.request.method).toBe('PUT');
+    expect(req.request.params.get('idUsuario')).toBe('5');
+    expect(req.request.body).toBeNull();
+    req.flush({});
+  });
+
+  it('cancelarReserva hace PUT /stands/{id}/cancelar-reserva', () => {
+    service.cancelarReserva(7).subscribe();
+    const req = http.expectOne(`${url}/7/cancelar-reserva`);
+    expect(req.request.method).toBe('PUT');
+    expect(req.request.body).toBeNull();
+    req.flush({});
+  });
+
+  it('contarOcupados hace GET /stands/evento/{id}/contar-ocupados y devuelve el número', () => {
+    let resultado: number | undefined;
+    service.contarOcupados(3).subscribe((n) => (resultado = n));
+    const req = http.expectOne(`${url}/evento/3/contar-ocupados`);
+    expect(req.request.method).toBe('GET');
+    req.flush(12);
+    expect(resultado).toBe(12);
+  });
+
+  it('ocupacion junta contar-ocupados con el totalElements de la feria', () => {
     let resultado: unknown;
     service.ocupacion(3).subscribe((o) => (resultado = o));
 
-    const pedidos = http.match((r) => r.url === url);
-    expect(pedidos.length).toBe(2);
-
-    const total = pedidos.find((p) => !p.request.params.has('estadoStand'))!;
-    const ocupados = pedidos.find((p) => p.request.params.get('estadoStand') === 'false')!;
+    const ocupados = http.expectOne(`${url}/evento/3/contar-ocupados`);
+    const total = http.expectOne((r) => r.url === url);
     expect(total.request.params.get('idEvento')).toBe('3');
-    expect(ocupados.request.params.get('idEvento')).toBe('3');
     expect(total.request.params.get('size')).toBe('1');
 
+    ocupados.flush(12);
     total.flush(pagina(20));
-    ocupados.flush(pagina(12));
     expect(resultado).toEqual({ ocupados: 12, total: 20 });
   });
 });
