@@ -1,5 +1,124 @@
-<!-- Pantalla vacía: la completa Cami -->
- <section class="container page">
-    <h1>Detalle de la feria</h1>
-    <p class="text-muted">Pantalla en construcción.</p>
- </section>
+<section class="container page">
+  <a class="volver" routerLink="/ferias">
+    <span class="icon icon-sm" aria-hidden="true">arrow_back</span> Volver a las ferias
+  </a>
+
+  @if (cargando()) {
+    <p class="text-muted">Cargando la feria…</p>
+  } @else if (mensajeError()) {
+    <div class="alert alert-error" role="alert">
+      {{ mensajeError() }}
+      <button type="button" class="btn btn-secondary btn-sm" (click)="cargar()">Reintentar</button>
+    </div>
+  } @else {
+    @if (evento(); as feria) {
+      <article class="card feria">
+        <div class="feria-foto">
+          @if (!imagenFallo()) {
+            <img
+              [src]="imagen()"
+              [alt]="'Foto ilustrativa de ' + feria.nombre"
+              (error)="imagenFallo.set(true)"
+            />
+          } @else {
+            <span class="icon icon-lg" aria-hidden="true">storefront</span>
+          }
+        </div>
+
+        <div class="card-body feria-cuerpo">
+          <div class="feria-titulo">
+            <h1>{{ feria.nombre }}</h1>
+            <app-badge-estado [estado]="feria.estado" />
+          </div>
+
+          <p class="card-meta">
+            <span class="icon icon-sm" aria-hidden="true">calendar_month</span>
+            {{ feria.fechaInicio | rangoFechas: feria.fechaFin }}
+          </p>
+          <p class="card-meta">
+            <span class="icon icon-sm" aria-hidden="true">location_on</span>
+            {{ feria.nombreLocalidad }}
+          </p>
+          <p class="card-meta">
+            <span class="icon icon-sm" aria-hidden="true">person</span>
+            Organiza {{ feria.nombreOrganizador }}
+          </p>
+          <p class="card-meta">
+            <span class="icon icon-sm" aria-hidden="true">square_foot</span>
+            {{ feria.metrosCuadrados }}
+          </p>
+
+          <span class="tag">{{ feria.precioEntradaTexto }}</span>
+        </div>
+      </article>
+
+      @if (cancelada()) {
+        <div class="alert alert-warning" role="status">
+          Esta feria fue cancelada, por eso no se pueden reservar stands.
+        </div>
+      }
+
+      @if (mensajeOk()) {
+        <div class="alert alert-success" role="status">
+          {{ mensajeOk() }}
+          <a routerLink="/mis-reservas">Ver mis reservas</a>
+        </div>
+      }
+
+      <div class="stands-encabezado">
+        <h2>Stands</h2>
+        @if (stands().length > 0) {
+          <p class="text-muted">
+            {{ disponibles() }} de {{ stands().length }}
+            {{ disponibles() === 1 ? 'disponible' : 'disponibles' }}
+          </p>
+        }
+      </div>
+
+      <div class="stands">
+        @for (s of stands(); track s.idStand) {
+          <article class="card stand" [class.ocupado]="!s.estadoStand">
+            <div class="stand-encabezado">
+              <span class="stand-numero">Stand {{ s.numeroStand }}</span>
+              <app-badge-estado [estado]="s.estadoStandTexto" />
+            </div>
+
+            <span class="tag">{{ precio(s.costoStand) }}</span>
+
+            @if (s.estadoStand) {
+              @if (!cancelada()) {
+                <button
+                  type="button"
+                  class="btn btn-primary btn-sm"
+                  [attr.aria-label]="'Reservar el stand ' + s.numeroStand"
+                  (click)="pedirReserva(s)"
+                >
+                  Reservar
+                </button>
+              }
+            } @else if (esMio(s)) {
+              <span class="text-small text-muted">Reservado por vos</span>
+            }
+          </article>
+        } @empty {
+          <div class="vacio">
+            <span class="icon icon-lg" aria-hidden="true">storefront</span>
+            <p>Esta feria todavía no tiene stands cargados.</p>
+          </div>
+        }
+      </div>
+    }
+  }
+
+  <app-modal-confirmacion
+    [abierto]="standElegido() !== null"
+    [titulo]="'¿Reservar el stand ' + (standElegido()?.numeroStand ?? '') + '?'"
+    [mensaje]="mensajeModal()"
+    textoConfirmar="Reservar"
+    tipo="primario"
+    [cargando]="reservando()"
+    [error]="errorModal()"
+    (confirmar)="confirmarReserva()"
+    (cancelar)="cerrarModal()"
+  />
+</section>
