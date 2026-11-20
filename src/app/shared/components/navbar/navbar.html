@@ -1,4 +1,4 @@
-<header class="navbar">
+<header class="navbar" [class.toldo]="esToldo()">
   <div class="container navbar-contenido">
     <a routerLink="/" class="marca" (click)="cerrarMenu()">
       <span class="icon icon-lg">storefront</span>
@@ -55,4 +55,11 @@
       }
     </nav>
   </div>
+
+  <!-- Faldón ondulado que cuelga del toldo (solo decorativo) -->
+  @if (esToldo()) {
+    <div class="container" aria-hidden="true">
+      <div class="faldon"></div>
+    </div>
+  }
 </header>

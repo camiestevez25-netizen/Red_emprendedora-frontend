@@ -1,5 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { NavigationEnd, Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { filter, map } from 'rxjs';
 import { AuthService } from '../../../core/services/auth.service';
 
 // Barra de navegación según el rol (pantalla 16 del diseño). Usa las signals de AuthService.
@@ -16,6 +18,19 @@ import { AuthService } from '../../../core/services/auth.service';
 export class Navbar {
   protected readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+
+  // URL actual (se actualiza en cada navegación)
+  private readonly url = toSignal(
+    this.router.events.pipe(
+      filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+      map((e) => e.urlAfterRedirects),
+    ),
+    { initialValue: this.router.url },
+  );
+
+  // En Inicio el navbar se dibuja como toldo de comercio.
+  // Para usarlo en todas las pantallas, cambiar esta línea por: readonly esToldo = signal(true);
+  readonly esToldo = computed(() => this.url().split(/[?#]/)[0] === '/');
 
   // Menú desplegable en celular
   readonly menuAbierto = signal(false);
