@@ -2,7 +2,7 @@
 .login-fondo {
   position: relative;
   overflow: hidden;
-  min-height: 100vh; //ACA SE CAMBIA LA ALTURA
+  min-height: 100vh; /*ACA SE CAMBIA LA ALTURA*/
 }
 
 .login-toldo {
