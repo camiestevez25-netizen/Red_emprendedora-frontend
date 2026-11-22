@@ -1,0 +1,155 @@
+/* Mismo fondo con toldo que el login */
+.registro-fondo {
+  position: relative;
+  overflow: hidden;
+}
+
+.registro-toldo {
+  --franja: 32px;
+}
+
+.registro {
+  display: flex;
+  justify-content: center;
+  padding-top: var(--space-6);
+}
+
+.registro-card {
+  width: 100%;
+  max-width: 640px;
+}
+
+.registro-card .card-body {
+  padding: var(--space-6);
+}
+
+.registro-seccion {
+  margin: var(--space-5) 0 var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+  font-size: 20px;
+}
+
+/* Dos campos por fila en pantallas grandes */
+.registro-fila {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 var(--space-4);
+}
+
+/* Elección de roles */
+.roles {
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  border: none;
+}
+
+.roles legend {
+  margin-bottom: var(--space-2);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.roles-opciones {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+
+.rol-opcion {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  text-align: left;
+  font-family: var(--font-body);
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    background-color 0.15s;
+}
+
+.rol-opcion:hover {
+  border-color: var(--color-secondary);
+}
+
+.rol-opcion strong,
+.rol-opcion small {
+  display: block;
+}
+
+.rol-opcion small {
+  color: var(--color-muted);
+  font-size: 13px;
+}
+
+.rol-opcion .icon {
+  color: var(--color-secondary);
+}
+
+.rol-opcion.activo {
+  background: var(--estado-activo-bg);
+  border-color: var(--color-primary);
+}
+
+.rol-opcion.activo .icon {
+  color: var(--color-primary);
+}
+
+/* Contraseña con botón para mostrarla (igual que el login) */
+.campo-contrasena {
+  position: relative;
+}
+
+.campo-contrasena input {
+  padding-right: var(--btn-height);
+}
+
+.ver-contrasena {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: var(--btn-height);
+  height: var(--btn-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--color-muted);
+  cursor: pointer;
+}
+
+.ver-contrasena:hover {
+  color: var(--color-text);
+}
+
+.registro-pie {
+  margin: var(--space-5) 0 0;
+  text-align: center;
+  font-size: 14px;
+}
+
+@media (max-width: 768px) {
+  .registro-toldo {
+    --franja: 16px;
+  }
+
+  .registro {
+    padding-top: var(--space-5);
+  }
+
+  .registro-card .card-body {
+    padding: var(--space-5);
+  }
+
+  .registro-fila,
+  .roles-opciones {
+    grid-template-columns: 1fr;
+  }
+}
