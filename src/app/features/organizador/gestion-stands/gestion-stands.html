@@ -1,5 +1,222 @@
-<!-- Pantalla vacía: la completa Cami -->
- <section class="container page">
-    <h1>Gestión de stands</h1>
-    <p class="text-muted">Pantalla en contrucción.</p>
- </section>
+<section class="container page">
+  <a class="volver" routerLink="/organizador/ferias">
+    <span class="icon icon-sm" aria-hidden="true">arrow_back</span> Volver a mis ferias
+  </a>
+
+  <div class="encabezado">
+    <div>
+      <h1>Gestión de stands</h1>
+      @if (evento(); as feria) {
+        <p class="text-muted">{{ feria.nombre }}</p>
+      }
+    </div>
+    @if (evento(); as feria) {
+      <app-badge-estado [estado]="feria.estado" />
+    }
+  </div>
+
+  @if (cancelada()) {
+    <div class="alert alert-warning" role="status">
+      Esta feria está cancelada: no se pueden cambiar sus stands.
+    </div>
+  } @else if (noEsMia()) {
+    <div class="alert alert-warning" role="status">
+      Esta feria es de otro/a organizador/ra: solo podés verla.
+    </div>
+  }
+
+  @if (mensajeError()) {
+    <div class="alert alert-error" role="alert">
+      {{ mensajeError() }}
+      <button type="button" class="btn btn-secondary btn-sm" (click)="recargar()">
+        Reintentar
+      </button>
+    </div>
+  }
+
+  @if (mensajeOk()) {
+    <div class="alert alert-success" role="status">{{ mensajeOk() }}</div>
+  }
+
+  @if (puedeEditar()) {
+    <form class="card formulario" #form="ngForm" (ngSubmit)="guardar(form)" novalidate>
+      <fieldset class="card-body" [disabled]="guardando()">
+        <h2>
+          {{ editando() ? 'Editar el stand ' + editando()!.numeroStand : 'Agregar un stand' }}
+        </h2>
+
+        @if (errorForm()) {
+          <div class="alert alert-error" role="alert">{{ errorForm() }}</div>
+        }
+
+        <div class="fila">
+          <div class="form-group">
+            <label for="numeroStand">Número de stand *</label>
+            <input
+              id="numeroStand"
+              name="numeroStand"
+              type="number"
+              min="1"
+              step="1"
+              placeholder="Ej. 1"
+              [(ngModel)]="datos.numeroStand"
+              #numero="ngModel"
+              required
+            />
+            @if ((numero.touched || form.submitted) && numero.errors?.['required']) {
+              <span class="form-error">Indicá el número del stand.</span>
+            }
+            @if ((numero.touched || form.submitted) && numero.errors?.['min']) {
+              <span class="form-error">El número tiene que ser 1 o más.</span>
+            }
+            <app-error-campo [errores]="errores()" campo="numeroStand" />
+          </div>
+
+          <div class="form-group">
+            <label for="costoStand">Costo ($) *</label>
+            <input
+              id="costoStand"
+              name="costoStand"
+              type="number"
+              min="1"
+              step="1"
+              placeholder="Ej. 1500"
+              [(ngModel)]="datos.costoStand"
+              #costo="ngModel"
+              required
+            />
+            @if ((costo.touched || form.submitted) && costo.errors?.['required']) {
+              <span class="form-error">Indicá el costo del stand.</span>
+            }
+            @if ((costo.touched || form.submitted) && costo.errors?.['min']) {
+              <span class="form-error">El costo tiene que ser mayor a 0.</span>
+            }
+            <app-error-campo [errores]="errores()" campo="costoStand" />
+          </div>
+        </div>
+
+        <div class="acciones">
+          @if (editando()) {
+            <button type="button" class="btn btn-secondary" (click)="cancelarEdicion(form)">
+              Cancelar edición
+            </button>
+          }
+          <button type="submit" class="btn btn-primary" [disabled]="guardando()">
+            {{ guardando() ? 'Guardando…' : editando() ? 'Guardar cambios' : 'Agregar stand' }}
+          </button>
+        </div>
+      </fieldset>
+    </form>
+  }
+
+  <div class="stands-encabezado">
+    <h2>Stands</h2>
+    @if (ocupacion(); as o) {
+      <p class="text-muted">
+        {{ o.ocupados }} de {{ o.total }} {{ o.ocupados === 1 ? 'ocupado' : 'ocupados' }}
+      </p>
+    }
+  </div>
+
+  @if (cargando() && stands().length === 0) {
+    <p class="text-muted">Cargando stands…</p>
+  } @else if (stands().length > 0) {
+    <div class="card table-wrapper">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>N°</th>
+            <th>Costo</th>
+            <th>Estado</th>
+            <th>Ocupante</th>
+            @if (puedeEditar()) {
+              <th>Acciones</th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (s of stands(); track s.idStand) {
+            <tr>
+              <td>
+                <strong>{{ s.numeroStand }}</strong>
+              </td>
+              <td>{{ precio(s.costoStand) }}</td>
+              <td><app-badge-estado [estado]="s.estadoStandTexto" /></td>
+              <td>
+                @if (s.nombreUsuario) {
+                  {{ s.nombreUsuario }}
+                  @if (s.nombreEmprendimiento) {
+                    <span class="dato-extra text-small text-muted">{{
+                      s.nombreEmprendimiento
+                    }}</span>
+                  }
+                } @else {
+                  <span class="text-muted">—</span>
+                }
+              </td>
+              @if (puedeEditar()) {
+                <td>
+                  <div class="acciones-fila">
+                    @if (s.estadoStand) {
+                      <button
+                        type="button"
+                        class="btn btn-secondary btn-sm"
+                        [attr.aria-label]="'Editar el stand ' + s.numeroStand"
+                        (click)="editar(s)"
+                      >
+                        Editar
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-outline-danger btn-sm"
+                        [attr.aria-label]="'Eliminar el stand ' + s.numeroStand"
+                        (click)="pedirEliminar(s)"
+                      >
+                        Eliminar
+                      </button>
+                    } @else {
+                      <button
+                        type="button"
+                        class="btn btn-outline-danger btn-sm"
+                        [attr.aria-label]="'Cancelar la reserva del stand ' + s.numeroStand"
+                        (click)="pedirCancelarReserva(s)"
+                      >
+                        Cancelar reserva
+                      </button>
+                    }
+                  </div>
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <app-paginador
+      [pagina]="pagina()"
+      [totalPaginas]="totalPaginas()"
+      (cambioPagina)="cargarStands($event)"
+    />
+  } @else if (!mensajeError()) {
+    <div class="card card-body vacio">
+      <span class="icon icon-lg" aria-hidden="true">storefront</span>
+      <p>Esta feria todavía no tiene stands.</p>
+      @if (puedeEditar()) {
+        <p class="text-small">Cargá el primero con el formulario de arriba.</p>
+      }
+    </div>
+  }
+
+  <app-modal-confirmacion
+    [abierto]="accion() !== null"
+    [titulo]="tituloModal()"
+    [mensaje]="mensajeModal()"
+    [textoConfirmar]="accion()?.tipo === 'eliminar' ? 'Eliminar' : 'Cancelar reserva'"
+    tipo="peligro"
+    [cargando]="procesando()"
+    [error]="errorModal()"
+    (confirmar)="confirmarAccion()"
+    (cancelar)="cerrarModal()"
+  />
+</section>
