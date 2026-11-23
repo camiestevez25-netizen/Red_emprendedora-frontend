@@ -4,6 +4,10 @@
   min-height: 100vh;
 }
 
+/* El contenido ocupa todo el alto que queda entre el navbar y el footer
+   (así Login puede centrarse en la pantalla sin barra para bajar) */
 .app-main {
   flex: 1;
-}
+  display: flex;
+  flex-direction: column;
+}
