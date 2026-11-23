@@ -1,5 +1,91 @@
-<!-- Pantalla vacía: la completa Lou -->
- <section class="container page">
+<section class="container page">
+  <div class="flex-between encabezado">
     <h1>Mis ferias</h1>
-    <p class="text-muted">Pantalla en contrucción.</p>
- </section>
+    <a routerLink="/organizador/ferias/nueva" class="btn btn-primary">
+      Crear feria
+      <span class="icon">add</span>
+    </a>
+  </div>
+
+  @if (mensajeOk()) {
+    <div class="alert alert-success">{{ mensajeOk() }}</div>
+  }
+
+  @if (cargando()) {
+    <p class="text-muted">Cargando tus ferias…</p>
+  } @else if (mensajeError()) {
+    <div class="alert alert-error">{{ mensajeError() }}</div>
+  } @else if (ferias().length === 0) {
+    <div class="card card-body vacio">
+      <p>Todavía no creaste ninguna feria.</p>
+      <a routerLink="/organizador/ferias/nueva" class="btn btn-primary">Crear mi primera feria</a>
+    </div>
+  } @else {
+    <!-- Filtro por estado -->
+    <div class="form-group filtro">
+      <label for="filtroEstado">Estado</label>
+      <select id="filtroEstado" name="filtroEstado" [ngModel]="filtroEstado()" (ngModelChange)="cambiarEstado($event)">
+        <option value="">Todos los estados</option>
+        @for (estado of estados; track estado) {
+          <option [value]="estado">{{ estado }}</option>
+        }
+      </select>
+    </div>
+
+    @if (filtradas().length === 0) {
+      <p class="text-muted">No tenés ferias en estado {{ filtroEstado() }}.</p>
+    } @else {
+      <div class="card table-wrapper">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Feria</th>
+              <th>Fechas</th>
+              <th>Localidad</th>
+              <th>Estado</th>
+              <th>Ocupación</th>
+              <th aria-label="Acciones"></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (f of feriasDePagina(); track f.id) {
+              <tr>
+                <td>{{ f.nombre }}</td>
+                <td>{{ f.fechaInicio | rangoFechas: f.fechaFin }}</td>
+                <td>{{ f.nombreLocalidad }}</td>
+                <td><app-badge-estado [estado]="f.estado" /></td>
+                <td>
+                  @if (ocupaciones()[f.id]; as o) {
+                    {{ o.ocupados }} / {{ o.total }}
+                  } @else {
+                    <span class="text-muted">—</span>
+                  }
+                </td>
+                <td class="acciones">
+                  <!-- Una feria cancelada ya no se puede gestionar -->
+                  @if (f.estado !== 'Cancelado') {
+                    <a class="btn btn-secondary btn-sm" [routerLink]="['/organizador/ferias', f.id, 'editar']">Editar</a>
+                    <a class="btn btn-secondary btn-sm" [routerLink]="['/organizador/ferias', f.id, 'stands']">Stands</a>
+                    <button type="button" class="btn btn-danger btn-sm" (click)="pedirCancelar(f)">Cancelar</button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <app-paginador [pagina]="pagina()" [totalPaginas]="totalPaginas()" (cambioPagina)="irAPagina($event)" />
+    }
+  }
+</section>
+
+<!-- Modal de Agus para cancelar o eliminar la feria -->
+@if (feriaACancelar(); as feria) {
+  <app-cancelar-feria
+    [evento]="feria"
+    [abierto]="true"
+    (cancelada)="alCancelar($event)"
+    (cerrar)="feriaACancelar.set(null)"
+  />
+}

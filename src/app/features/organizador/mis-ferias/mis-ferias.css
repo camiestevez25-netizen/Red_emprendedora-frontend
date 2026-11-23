@@ -1,0 +1,27 @@
+.encabezado {
+  margin-bottom: var(--space-5);
+}
+
+.encabezado h1 {
+  margin: 0;
+}
+
+.filtro {
+  max-width: 260px;
+}
+
+.acciones {
+  white-space: nowrap;
+  text-align: right;
+}
+
+.acciones .btn + .btn {
+  margin-left: var(--space-2);
+}
+
+.vacio {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+}

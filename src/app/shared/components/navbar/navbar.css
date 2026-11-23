@@ -22,33 +22,43 @@
   color: var(--color-text);
 }
 
+/* Logo más grande */
+.marca .icon {
+  font-size: 44px;
+}
 .marca:hover {
   color: var(--color-primary);
   text-decoration: none;
 }
+
 
 .marca-texto {
   font-family: var(--font-title);
   line-height: 1.1;
 }
 
-.navbar-menu {
+/* Botón Menú + sesión */
+.navbar-derecha {
   display: flex;
   align-items: center;
-  gap: var(--space-5);
+  gap: var(--space-3);
 }
 
-.navbar-menu a:not(.btn):not(.avatar) {
+/* "Menú": solo la palabra y la flechita, sin recuadro (mismo tamaño que los botones de al lado) */
+.btn-menu {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  background: none;
+  border: none;
   color: var(--color-text);
-  font-weight: 500;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
 }
 
-.navbar-menu a:not(.btn):not(.avatar):hover,
-.navbar-menu a.activo {
-  color: var(--color-primary);
-}
-
-.navbar-menu a.activo {
+.btn-menu:hover,
+.btn-menu[aria-expanded='true'] {
   text-decoration: underline;
   text-underline-offset: 6px;
 }
@@ -72,41 +82,182 @@
   text-decoration: none;
 }
 
-.navbar-toggle {
-  display: none;
+/* La lista se despliega pegada debajo de "Menú", alineada a su derecha */
+.menu-contenedor {
+  position: relative;
+}
+
+.desplegable {
+  position: absolute;
+  z-index: 2; /* por encima del faldón */
+  top: calc(100% + var(--space-2));
+  right: 0;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  min-width: 240px;
   padding: var(--space-2);
-  background: none;
+}
+
+.desplegable a,
+.desplegable button {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
   border: none;
+  border-radius: var(--radius-sm);
+  background: none;
   color: var(--color-text);
+  font: inherit;
+  font-weight: 500;
+  text-align: left;
   cursor: pointer;
 }
 
-/* Celular: el menú se despliega debajo de la barra */
+.desplegable a:hover,
+.desplegable button:hover {
+  background-color: var(--color-surface-alt);
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.desplegable a.activo {
+  color: var(--color-primary);
+  background-color: var(--color-surface-alt);
+}
+
+.desplegable .icon {
+  color: var(--color-primary);
+}
+
+.separador {
+  height: 1px;
+  margin: var(--space-2) 0;
+  background-color: var(--color-border);
+}
+
+/* Lo que va solo en compu o solo en celular */
+.solo-celular {
+  display: none !important;
+}
+
 @media (max-width: 768px) {
-  .navbar-toggle {
-    display: inline-flex;
+  .solo-compu {
+    display: none !important;
   }
 
-  .navbar-menu {
-    display: none;
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    flex-direction: column;
-    align-items: stretch;
-    gap: var(--space-3);
-    padding: var(--space-4);
-    background-color: var(--color-surface);
-    border-bottom: 1px solid var(--color-border);
-    box-shadow: var(--shadow);
+  .solo-celular {
+    display: flex !important;
+  }
+}
+
+/* ==========================================================
+   Toldo de comercio (Inicio)
+   - Parte de arriba: verde liso, de borde a borde de la pantalla,
+     con los costados inclinados a 45°
+     (para 45°, lo que entra cada costado = la altura del toldo).
+   - Abajo cuelga el faldón rayado con el borde ondulado y sombra.
+   ========================================================== */
+.navbar.toldo {
+  --alto-toldo: 76px;   /* altura de la parte inclinada */
+  --raya: 40px;         /* ancho de cada raya (y de cada onda del faldón) */
+  --alto-faldon: 30px;  /* alto del faldón ondulado */
+  /* sombra que se usa arriba del toldo para que parezca que cae */
+  --sombra-caida: color-mix(in srgb, var(--color-text) 30%, transparent);
+
+  isolation: isolate; /* para que el fondo del toldo quede detrás del contenido */
+  background: transparent;
+  border-bottom: none;
+}
+
+/* Parte inclinada: verde liso. Va como fondo, así recortarla no corta el menú */
+.navbar.toldo::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--alto-toldo);
+  background:
+    /* costura con el faldón: una línea más oscura abajo */
+    linear-gradient(to top, var(--color-primary-hover) 0 4px, transparent 4px),
+    /* sombra arriba: el toldo cae hacia adelante */
+    linear-gradient(to bottom, var(--sombra-caida), transparent 70%),
+    var(--color-primary);
+  clip-path: polygon(var(--alto-toldo) 0, calc(100% - var(--alto-toldo)) 0, 100% 100%, 0 100%);
+}
+
+.navbar.toldo .navbar-contenido {
+  height: var(--alto-toldo);
+  min-height: 0;
+  /* margen para que nada quede sobre los costados inclinados */
+  padding-left: max(var(--space-5), calc(var(--alto-toldo) * 0.8));
+  padding-right: max(var(--space-5), calc(var(--alto-toldo) * 0.8));
+}
+
+/* Faldón: rayado, de borde a borde, con una onda por cada raya */
+.navbar.toldo .faldon {
+  height: var(--alto-faldon);
+  background:
+    linear-gradient(to bottom, color-mix(in srgb, var(--color-text) 15%, transparent), transparent 40%),
+    linear-gradient(90deg, var(--color-primary) 50%, var(--color-secondary) 50%) center top /
+      calc(var(--raya) * 2) 100% repeat-x;
+  /* franja de arriba + un semicírculo por raya = borde ondulado */
+  --onda: radial-gradient(
+      circle calc(var(--raya) / 2) at calc(var(--raya) / 2) calc(var(--alto-faldon) - var(--raya) / 2),
+      #000 98%,
+      transparent
+    )
+    calc(50% - var(--raya) / 2) 0 / var(--raya) 100% repeat-x; /* una onda debajo de cada raya */
+  --franja: linear-gradient(#000 0 0) 0 0 / 100% calc(var(--alto-faldon) - var(--raya) / 2) no-repeat;
+  -webkit-mask: var(--franja), var(--onda);
+  mask: var(--franja), var(--onda);
+  filter: drop-shadow(0 3px 2px color-mix(in srgb, var(--color-text) 25%, transparent));
+}
+
+/* Sobre el verde liso: logo, "Menú" y botones de sesión en crema */
+.navbar.toldo .marca,
+.navbar.toldo .btn-menu {
+  color: var(--color-surface);
+}
+
+/* Iniciar sesión: solo borde crema */
+.navbar.toldo .navbar-derecha .btn-secondary {
+  background-color: transparent;
+  border-color: var(--color-surface);
+  color: var(--color-surface);
+}
+
+/* Registrate: un verde más oscuro con borde crema, para que resalte */
+.navbar.toldo .navbar-derecha .btn-primary {
+  background-color: var(--color-primary-hover);
+  border-color: var(--color-surface);
+  color: var(--color-surface);
+}
+
+.navbar.toldo .navbar-derecha .btn-secondary:hover,
+.navbar.toldo .navbar-derecha .btn-primary:hover {
+  background-color: color-mix(in srgb, var(--color-surface) 15%, transparent);
+}
+
+.navbar.toldo .avatar {
+  background-color: var(--color-surface);
+  color: var(--color-primary);
+}
+
+@media (max-width: 768px) {
+  .navbar.toldo {
+    --alto-toldo: 60px;
+    --raya: 32px;
+    --alto-faldon: 24px;
   }
 
-  .navbar-menu.abierto {
-    display: flex;
-  }
-
-  .avatar {
-    align-self: flex-start;
+  .navbar.toldo .marca-texto {
+    display: none; /* en celular solo el ícono, para que entre en el toldo */
   }
 }
