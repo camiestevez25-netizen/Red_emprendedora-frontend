@@ -1,1 +1,255 @@
-<p>registro works!</p>
+<div class="registro-fondo">
+  <div class="guarda-toldo registro-toldo" aria-hidden="true"></div>
+
+  <section class="container page registro">
+    <div class="card registro-card">
+      <div class="card-body">
+        <h1>Creá tu cuenta</h1>
+        <p class="text-muted">Sumate a la red de emprendedores y organizadores de ferias.</p>
+
+        @if (mensajeError()) {
+          <div class="alert alert-error" role="alert">{{ mensajeError() }}</div>
+        }
+
+        <form
+          #form="ngForm"
+          (ngSubmit)="form.valid && rolesElegidos().length > 0 && registrarse()"
+          novalidate
+        >
+          <!-- Roles: se pueden elegir los dos -->
+          <fieldset class="roles">
+            <legend>¿Cómo querés usar Red Emprendedora?</legend>
+            <div class="roles-opciones">
+              <button
+                type="button"
+                class="rol-opcion"
+                [class.activo]="esEmprendedor()"
+                [attr.aria-pressed]="esEmprendedor()"
+                (click)="esEmprendedor.set(!esEmprendedor())"
+              >
+                <span class="icon">storefront</span>
+                <span>
+                  <strong>Emprendedor/a</strong>
+                  <small>Reservo stands en ferias</small>
+                </span>
+              </button>
+              <button
+                type="button"
+                class="rol-opcion"
+                [class.activo]="esOrganizador()"
+                [attr.aria-pressed]="esOrganizador()"
+                (click)="esOrganizador.set(!esOrganizador())"
+              >
+                <span class="icon">event</span>
+                <span>
+                  <strong>Organizador/a</strong>
+                  <small>Publico y gestiono ferias</small>
+                </span>
+              </button>
+            </div>
+            @if (form.submitted && rolesElegidos().length === 0) {
+              <span class="form-error">Elegí al menos una opción</span>
+            } @else {
+              <span class="form-help">Podés elegir las dos.</span>
+            }
+            <app-error-campo [errores]="errores()" campo="roles" />
+          </fieldset>
+
+          <h2 class="registro-seccion">Tus datos</h2>
+
+          <div class="form-group">
+            <label for="nombre">Nombre completo</label>
+            <input
+              id="nombre"
+              type="text"
+              name="nombre"
+              autocomplete="name"
+              maxlength="50"
+              [(ngModel)]="datos.nombre"
+              #nombre="ngModel"
+              required
+            />
+            @if ((nombre.touched || form.submitted) && nombre.errors?.['required']) {
+              <span class="form-error">Ingresá tu nombre</span>
+            }
+            <app-error-campo [errores]="errores()" campo="nombre" />
+          </div>
+
+          <div class="registro-fila">
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input
+                id="email"
+                type="email"
+                name="email"
+                autocomplete="email"
+                maxlength="50"
+                placeholder="tu@email.com"
+                [(ngModel)]="datos.email"
+                #email="ngModel"
+                required
+                email
+              />
+              @if ((email.touched || form.submitted) && email.errors?.['required']) {
+                <span class="form-error">Ingresá tu email</span>
+              } @else if ((email.touched || form.submitted) && email.errors?.['email']) {
+                <span class="form-error">El email no tiene un formato válido</span>
+              }
+              <app-error-campo [errores]="errores()" campo="email" />
+            </div>
+
+            <div class="form-group">
+              <label for="telefono">Teléfono</label>
+              <input
+                id="telefono"
+                type="tel"
+                name="telefono"
+                autocomplete="tel"
+                maxlength="15"
+                placeholder="2475 123456"
+                [(ngModel)]="datos.telefono"
+                #telefono="ngModel"
+                required
+              />
+              @if ((telefono.touched || form.submitted) && telefono.errors?.['required']) {
+                <span class="form-error">Ingresá tu teléfono</span>
+              }
+              <app-error-campo [errores]="errores()" campo="telefono" />
+            </div>
+          </div>
+
+          <div class="registro-fila">
+            <div class="form-group">
+              <label for="direccion">Dirección</label>
+              <input
+                id="direccion"
+                type="text"
+                name="direccion"
+                autocomplete="street-address"
+                maxlength="50"
+                [(ngModel)]="datos.direccion"
+                #direccion="ngModel"
+                required
+              />
+              @if ((direccion.touched || form.submitted) && direccion.errors?.['required']) {
+                <span class="form-error">Ingresá tu dirección</span>
+              }
+              <app-error-campo [errores]="errores()" campo="direccion" />
+            </div>
+
+            <div class="form-group">
+              <label for="localidad">Localidad</label>
+              <select
+                id="localidad"
+                name="idLocalidad"
+                [(ngModel)]="datos.idLocalidad"
+                #localidad="ngModel"
+                required
+              >
+                <option [ngValue]="null" disabled>Elegí tu localidad</option>
+                @for (loc of localidades(); track loc.idLocalidad) {
+                  <option [ngValue]="loc.idLocalidad">
+                    {{ loc.nombreLocalidad }}, {{ loc.provinciaLocalidad }}
+                  </option>
+                }
+              </select>
+              @if ((localidad.touched || form.submitted) && localidad.errors?.['required']) {
+                <span class="form-error">Elegí tu localidad</span>
+              }
+              <app-error-campo [errores]="errores()" campo="idLocalidad" />
+            </div>
+          </div>
+
+          @if (esEmprendedor()) {
+            <h2 class="registro-seccion">Tu emprendimiento</h2>
+
+            <div class="registro-fila">
+              <div class="form-group">
+                <label for="nombreEmprendimiento">Nombre del emprendimiento</label>
+                <input
+                  id="nombreEmprendimiento"
+                  type="text"
+                  name="nombreEmprendimiento"
+                  maxlength="100"
+                  [(ngModel)]="datos.nombreEmprendimiento"
+                />
+                <app-error-campo [errores]="errores()" campo="nombreEmprendimiento" />
+              </div>
+
+              <div class="form-group">
+                <label for="tipoEmprendimiento">Tipo de emprendimiento</label>
+                <select
+                  id="tipoEmprendimiento"
+                  name="tipoEmprendimiento"
+                  [(ngModel)]="datos.tipoEmprendimiento"
+                >
+                  <option value="">Elegí una opción</option>
+                  @for (tipo of tiposEmprendimiento; track tipo) {
+                    <option [value]="tipo">{{ tipo }}</option>
+                  }
+                </select>
+                <app-error-campo [errores]="errores()" campo="tipoEmprendimiento" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="instagram">Instagram <span class="text-muted">(opcional)</span></label>
+              <input
+                id="instagram"
+                type="text"
+                name="instagram"
+                maxlength="100"
+                placeholder="@tuemprendimiento"
+                [(ngModel)]="datos.instagram"
+              />
+              <app-error-campo [errores]="errores()" campo="instagram" />
+            </div>
+          }
+
+          <div class="form-group">
+            <label for="contrasena">Contraseña</label>
+            <div class="campo-contrasena">
+              <input
+                id="contrasena"
+                [type]="verContrasena() ? 'text' : 'password'"
+                name="contrasena"
+                autocomplete="new-password"
+                maxlength="50"
+                [(ngModel)]="datos.contrasena"
+                #contrasena="ngModel"
+                required
+                minlength="6"
+              />
+              <button
+                type="button"
+                class="ver-contrasena"
+                (click)="verContrasena.set(!verContrasena())"
+                [attr.aria-label]="verContrasena() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+              >
+                <span class="icon">{{ verContrasena() ? 'visibility_off' : 'visibility' }}</span>
+              </button>
+            </div>
+            @if ((contrasena.touched || form.submitted) && contrasena.errors?.['required']) {
+              <span class="form-error">Ingresá una contraseña</span>
+            } @else if (
+              (contrasena.touched || form.submitted) && contrasena.errors?.['minlength']
+            ) {
+              <span class="form-error">La contraseña debe tener entre 6 y 50 caracteres</span>
+            } @else {
+              <span class="form-help">Entre 6 y 50 caracteres.</span>
+            }
+            <app-error-campo [errores]="errores()" campo="contrasena" />
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block" [disabled]="cargando()">
+            {{ cargando() ? 'Creando tu cuenta…' : 'Registrarme' }}
+          </button>
+        </form>
+
+        <p class="registro-pie text-muted">
+          ¿Ya tenés cuenta? <a routerLink="/login">Iniciá sesión</a>
+        </p>
+      </div>
+    </div>
+  </section>
+</div>
