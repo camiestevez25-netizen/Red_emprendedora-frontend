@@ -49,6 +49,27 @@
           </p>
 
           <span class="tag">{{ feria.precioEntradaTexto }}</span>
+                      <div class="contacto">
+            @if (!logueada()) {
+              <a
+                class="btn btn-secondary btn-sm"
+                routerLink="/login"
+                [queryParams]="{ volver: rutaVolver }"
+              >
+                Iniciá sesión para contactar
+              </a>
+            } @else if (enlaceContacto(); as enlace) {
+              <a
+                class="btn btn-secondary btn-sm"
+                [href]="enlace"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <span class="icon icon-sm" aria-hidden="true">chat</span>
+                Contactar por WhatsApp
+              </a>
+            }
+          </div>
         </div>
       </article>
 
