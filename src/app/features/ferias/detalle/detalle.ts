@@ -12,6 +12,8 @@ import { BadgeEstado } from '../../../shared/components/badge-estado/badge-estad
 import { ModalConfirmacion } from '../../../shared/components/modal-confirmacion/modal-confirmacion';
 import { RangoFechasPipe } from '../../../shared/pipes/rango-fechas-pipe';
 import { formatoPrecio } from '../../../shared/utils/precio';
+import { UsuarioService } from '../../../core/services/usuario.service';
+import { enlaceWhatsapp } from '../../../shared/utils/whatsapp';
 
 const CANTIDAD_FOTOS = 4;
 
@@ -27,11 +29,24 @@ export class Detalle {
   private readonly auth = inject(AuthService);
   private readonly eventoService = inject(EventoService);
   private readonly standService = inject(StandService);
+  private readonly usuarioService = inject(UsuarioService);
 
   // /ferias/7 -> 7
   private readonly id = Number(this.route.snapshot.paramMap.get('id'));
 
   readonly precio = formatoPrecio;
+    // Contacto (RF6): el teléfono del organizador solo se pide con sesión iniciada
+  readonly logueada = computed(() => this.auth.estaLogueado());
+  readonly rutaVolver = `/ferias/${this.id}`;
+  readonly telefonoOrganizador = signal<string | null>(null);
+  readonly enlaceContacto = computed(() => {
+    const feria = this.evento();
+    if (!feria) return null;
+    return enlaceWhatsapp(
+      this.telefonoOrganizador(),
+      `Hola! Vi la feria "${feria.nombre}" en Red Emprendedora y quiero consultarte.`,
+    );
+  });
 
   readonly evento = signal<Evento | null>(null);
   readonly stands = signal<Stand[]>([]);
@@ -83,12 +98,14 @@ export class Detalle {
         this.evento.set(evento);
         this.stands.set(stands.content);
         this.cargando.set(false);
+        this.cargarContacto(evento.idUsuario);
       },
       error: (err: HttpErrorResponse) => {
         this.cargando.set(false);
         this.mensajeError.set(leerError(err).mensaje);
       },
     });
+    
   }
 
   esMio(stand: Stand): boolean {
@@ -142,6 +159,16 @@ export class Detalle {
   private refrescarEstadoFeria(): void {
     this.eventoService.obtener(this.id).subscribe({
       next: (evento) => this.evento.set(evento),
+    });
+  }
+    // GET /api/usuarios/{id}: solo con sesión. Si falla (403, etc.) simplemente no hay botón
+  private cargarContacto(idOrganizador: number): void {
+    this.telefonoOrganizador.set(null);
+    if (!this.auth.estaLogueado()) return;
+
+    this.usuarioService.obtener(idOrganizador).subscribe({
+      next: (organizador) => this.telefonoOrganizador.set(organizador.telefono),
+      error: () => this.telefonoOrganizador.set(null),
     });
   }
 }

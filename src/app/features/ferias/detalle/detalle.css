@@ -130,4 +130,10 @@
     flex-direction: column;
     align-items: flex-start;
   }
+
+  .contacto {
+  margin-top: auto;
+  padding-top: var(--space-3);
+  align-self: flex-end;
+}
 }

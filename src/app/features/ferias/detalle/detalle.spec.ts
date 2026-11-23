@@ -11,6 +11,7 @@ import { StandService } from '../../../core/services/stand.service';
 import { Evento } from '../../../core/models/evento.model';
 import { Stand } from '../../../core/models/stand.model';
 import { Page } from '../../../core/models/page.model';
+import { UsuarioService } from '../../../core/services/usuario.service';
 
 function feria(estado: Evento['estado']): Evento {
   return {
@@ -22,6 +23,7 @@ function feria(estado: Evento['estado']): Evento {
     precioEntradaTexto: 'Entrada gratuita',
     nombreLocalidad: 'Tandil',
     nombreOrganizador: 'Agus',
+    idUsuario: 5 ,
     metrosCuadrados: '200 m²',
   } as Evento;
 }
@@ -64,6 +66,7 @@ describe('Detalle', () => {
   let estadoFeria: Evento['estado'];
   let listar: ReturnType<typeof vi.fn>;
   let reservar: ReturnType<typeof vi.fn>;
+  let obtenerUsuario: ReturnType<typeof vi.fn>;
 
   function crear() {
     const fixture = TestBed.createComponent(Detalle);
@@ -76,6 +79,7 @@ describe('Detalle', () => {
     estadoFeria = 'Activo';
     listar = vi.fn(() => of(pagina([stand(1, 1, true), stand(2, 2, false, 9), stand(3, 3, true)])));
     reservar = vi.fn((id: number, idUsuario: number) => of({ ...stand(id, id, false, idUsuario) }));
+    obtenerUsuario = vi.fn(() => of({ idUsuario: 5, telefono: '249 412-3456' }));
 
     TestBed.configureTestingModule({
       imports: [Detalle],
@@ -94,6 +98,7 @@ describe('Detalle', () => {
         },
         { provide: EventoService, useValue: { obtener: () => of(feria(estadoFeria)) } },
         { provide: StandService, useValue: { listar, reservar } },
+        { provide: UsuarioService, useValue: { obtener: obtenerUsuario } },
       ],
     });
   });
@@ -182,5 +187,30 @@ describe('Detalle', () => {
       b.textContent?.includes('Reservar'),
     );
     expect(botones.length).toBe(0);
+  });
+    it('con sesión pide el teléfono del organizador y muestra el botón de WhatsApp', () => {
+    const el = crear().nativeElement as HTMLElement;
+
+    expect(obtenerUsuario).toHaveBeenCalledWith(5);
+    expect(el.querySelector('a[href^="https://wa.me/5492494123456"]')).not.toBeNull();
+    expect(el.textContent).toContain('Contactar por WhatsApp');
+  });
+
+  it('sin sesión no pide el teléfono y ofrece iniciar sesión', () => {
+    logueada.set(false);
+    const el = crear().nativeElement as HTMLElement;
+
+    expect(obtenerUsuario).not.toHaveBeenCalled();
+    expect(el.textContent).toContain('Iniciá sesión para contactar');
+    expect(el.querySelector('a[href^="https://wa.me/"]')).toBeNull();
+  });
+
+  it('si no se puede traer el teléfono, no hay botón pero la feria se muestra igual', () => {
+    obtenerUsuario.mockReturnValue(throwError(() => new HttpErrorResponse({ status: 403 })));
+    const fixture = crear();
+    const el = fixture.nativeElement as HTMLElement;
+
+    expect(fixture.componentInstance.evento()?.nombre).toBe('Feria del Lago');
+    expect(el.querySelector('a[href^="https://wa.me/"]')).toBeNull();
   });
 });
