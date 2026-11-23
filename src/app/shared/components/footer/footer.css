@@ -45,3 +45,8 @@
   color: var(--color-primary);
   text-decoration: none;
 }
+
+/* En Login y Registro el footer va pegado al contenido (sin el espacio de arriba) */
+:host(.compacto) .footer {
+  margin-top: 0;
+}
