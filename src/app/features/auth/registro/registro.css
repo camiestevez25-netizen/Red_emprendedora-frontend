@@ -153,3 +153,22 @@
     grid-template-columns: 1fr;
   }
 }
+
+.acceso-marca {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+  color: var(--color-primary);
+  font-family: var(--font-title);
+  font-size: 18px;
+}
+
+.acceso-marca .icon {
+  font-size: 32px;
+}
+
+.acceso-marca:hover {
+  color: var(--color-text);
+  text-decoration: none;
+}

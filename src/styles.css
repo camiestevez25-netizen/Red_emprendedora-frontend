@@ -441,8 +441,8 @@ textarea.ng-invalid.ng-touched {
    Tamaño: cambiá --franja (por defecto 24px). Alto total = franja × 1,5 */
 .guarda-toldo {
   --franja: 24px;
-  height: clac(var(--franja) * 1.5);
-  background: repeating-liner-gradient(
+  height: calc(var(--franja) * 1.5);
+  background: repeating-linear-gradient(
     90deg,
     var(--color-primary) 0 var(--franja),
     var(--color-secondary) var(--franja) calc(var(--franja) * 2)
