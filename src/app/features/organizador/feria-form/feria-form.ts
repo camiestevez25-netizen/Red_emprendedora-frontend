@@ -136,7 +136,6 @@ export class FeriaForm {
     });
   }
 
-  // TEMPORAL: cuando Lou suba LocalidadService, usar localidadService.listar()
   private cargarLocalidades(): void {
     this.localidadService.listar().subscribe({
       next: (lista) => this.localidades.set(lista),
